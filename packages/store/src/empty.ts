@@ -187,6 +187,9 @@ export function emptyWorld(now = new Date()): WorldState {
       pauseNewSignups: false,
       pauseColdAdSpend: false,
     },
+    socialPosts: [],
+    notifications: [],
+    ipVault: { tracks: [], lastAuditAt: null },
     cycleId: "init",
     updatedAt: iso,
   };

@@ -10,6 +10,11 @@ import {
   FIXTURE_SWAGBUCKS,
   FIXTURE_VERIFIED_AIRDROP,
   FIXTURE_WEATHER,
+  FIXTURE_YOUTUBE_MONETIZE,
+  FIXTURE_PROLIFIC_PANEL,
+  FIXTURE_GRASS_NODE,
+  FIXTURE_AMAZON_AFFILIATE,
+  FIXTURE_MUSIC_SYNC_DEAL,
 } from "./fixtures.js";
 
 function expectTotal(total: number, min: number, max: number) {
@@ -81,5 +86,42 @@ describe("hard rejects and airdrop authenticity", () => {
     expect(r.reason_codes).toContain("AIRDROP_AUTHENTICITY_VERIFIED");
     expect(r.reason_codes).not.toContain("PREPAID_CLAIM");
     expect(r.decision).not.toBe("execute");
+  });
+});
+
+describe("new verticals — golden fixtures", () => {
+  it("YouTube Monetization", () => {
+    const r = scoreOpportunity(FIXTURE_YOUTUBE_MONETIZE);
+    expectTotal(r.total, 60, 80);
+    expect(r.decision).toBe("queue");
+    expect(r.reason_codes).toContain("OWNED_MEDIA_PASSIVE");
+  });
+
+  it("Prolific Panel", () => {
+    const r = scoreOpportunity(FIXTURE_PROLIFIC_PANEL);
+    expectTotal(r.total, 50, 75);
+    expect(r.decision).toBe("queue");
+    expect(r.reason_codes).toContain("PANEL_SCREENING_REQUIRED");
+  });
+
+  it("Grass Node", () => {
+    const r = scoreOpportunity(FIXTURE_GRASS_NODE);
+    expectTotal(r.total, 35, 60);
+    expect(r.decision).toBe("queue");
+    expect(r.reason_codes).toContain("PASSIVE_BACKGROUND");
+  });
+
+  it("Amazon Affiliate", () => {
+    const r = scoreOpportunity(FIXTURE_AMAZON_AFFILIATE);
+    expectTotal(r.total, 40, 70);
+    expect(r.decision).toBe("queue");
+    expect(r.reason_codes).toContain("AFFILIATE_PASSIVE");
+  });
+
+  it("DISCO.fm Sync Deal", () => {
+    const r = scoreOpportunity(FIXTURE_MUSIC_SYNC_DEAL);
+    expectTotal(r.total, 70, 95);
+    expect(r.decision).toBe("queue");
+    expect(r.reason_codes).toContain("MUSIC_SYNC_HUMAN_GATE");
   });
 });

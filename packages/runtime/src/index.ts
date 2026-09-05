@@ -9,3 +9,6 @@ export * from "./sign.js";
 export * from "./profit-sweep.js";
 export * from "./risk.js";
 export * from "./treasury.js";
+export * from "./media-factory.js";
+export * from "./social-agent.js";
+export * from "./notify.js";

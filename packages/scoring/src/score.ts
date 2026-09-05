@@ -71,6 +71,10 @@ export function timePoints(
 export function reliabilityPoints(opp: Opportunity, hard: boolean): number {
   if (hard) return 0;
   if (opp.compensationAsset === "TOKEN" && opp.tokenMarkUsd === null) return 6;
+  if (opp.sourceClass === "owned_media_monetize" && opp.enrolledPlatform && (opp.compensationAsset === "USD" || opp.compensationAsset === "PAYPAL")) return 15;
+  if (opp.sourceClass === "panel_research") return opp.establishedPayoutHistory ? 15 : 12;
+  if (opp.sourceClass === "music_rights" && opp.establishedPayoutHistory) return 15;
+  if (opp.sourceClass === "affiliate" && opp.documentedRate) return 12;
   if (opp.establishedPayoutHistory) return 15;
   if (opp.enrolledPlatform && (opp.compensationAsset === "USD" || opp.compensationAsset === "PAYPAL")) {
     return 12;
@@ -92,9 +96,15 @@ export function riskInversePoints(opp: Opportunity, hard: boolean): number {
     opp.sourceClass === "gpt" ||
     opp.sourceClass === "research" ||
     opp.sourceClass === "usability" ||
-    opp.sourceClass === "depin"
+    opp.sourceClass === "depin" ||
+    opp.sourceClass === "panel_research" ||
+    opp.sourceClass === "music_rights" ||
+    opp.sourceClass === "depin_node"
   ) {
     return 14;
+  }
+  if (opp.sourceClass === "owned_media_monetize" || opp.sourceClass === "affiliate") {
+    return 18;
   }
   const fiat = opp.compensationAsset === "USD" || opp.compensationAsset === "PAYPAL";
   if (fiat && !opp.requiresWallet && !opp.kycRequired) return 20;
@@ -110,12 +120,11 @@ export function capitalPoints(opp: Opportunity, policy: StandingOrders): number 
 }
 
 export function fitPoints(opp: Opportunity): number {
-  if (opp.sourceClass === "owned_media") return 10;
-  if (opp.sourceClass === "weather_data") return 8;
-  if (opp.sourceClass === "research") return 6;
-  if (opp.sourceClass === "learn_earn") return 5;
-  if (opp.sourceClass === "depin") return 5;
-  if (opp.sourceClass === "gpt" || opp.sourceClass === "usability") return 5;
+  if (opp.sourceClass === "owned_media" || opp.sourceClass === "owned_media_monetize" || opp.sourceClass === "music_rights") return 10;
+  if (opp.sourceClass === "weather_data" || opp.sourceClass === "social_post") return 8;
+  if (opp.sourceClass === "panel_research") return 7;
+  if (opp.sourceClass === "research" || opp.sourceClass === "affiliate") return 6;
+  if (opp.sourceClass === "learn_earn" || opp.sourceClass === "depin" || opp.sourceClass === "depin_node" || opp.sourceClass === "gpt" || opp.sourceClass === "usability") return 5;
   if (opp.sourceClass === "airdrop") return 4;
   return 5;
 }
@@ -149,12 +158,33 @@ export function decide(
   }
 
   if (
-    (opp.sourceClass === "depin" || opp.sourceClass === "weather_data") &&
+    (opp.sourceClass === "depin" || opp.sourceClass === "weather_data" || opp.sourceClass === "depin_node") &&
     (opp.incrementalMinutes === 0 || opp.timeEstimateMinutes === 0) &&
     cashable &&
     total >= 42 &&
     total <= 54
   ) {
+    return "queue";
+  }
+
+  if (opp.sourceClass === "owned_media_monetize" && opp.incrementalMinutes === 0) {
+    codes.push("OWNED_MEDIA_PASSIVE", "NOT_STRETCH_PATH");
+    return "queue";
+  }
+  if (opp.sourceClass === "music_rights" && opp.compensationAsset === "TOKEN" && opp.tokenMarkUsd === null) {
+    codes.push("MUSIC_ROYALTY_PENDING");
+    return "watch";
+  }
+  if (opp.sourceClass === "music_rights" && opp.rawNotes.toLowerCase().includes("sync")) {
+    codes.push("MUSIC_SYNC_HUMAN_GATE");
+    return "queue";
+  }
+  if (opp.sourceClass === "affiliate" && opp.incrementalMinutes === 0) {
+    codes.push("AFFILIATE_PASSIVE");
+    return "queue";
+  }
+  if (opp.sourceClass === "panel_research" && !opp.kycAlreadyComplete) {
+    codes.push("PANEL_SCREENING_REQUIRED");
     return "queue";
   }
 

@@ -65,7 +65,7 @@ export function prospectingPausedBeforeRetargeting(
 }
 
 export function budgetIncreaseAllowed(
-  policy: StandingOrders,
+  _policy: StandingOrders,
   floor: FloorStatus,
   deltaUsd: number,
 ): boolean {

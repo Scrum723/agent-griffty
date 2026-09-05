@@ -1,0 +1,1 @@
+Place icon.icns (macOS), icon.ico (Windows), and icon.png (Linux) here before building distributables. Recommended size: 512x512px. The Weatherman brand colors: #003087 (Bills blue) / #C8102E (Bills red) / #0A1E3C (dark navy).

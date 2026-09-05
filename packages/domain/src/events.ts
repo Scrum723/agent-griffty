@@ -28,6 +28,9 @@ export const EVENT_NAMES: EventName[] = [
   "sign.requested",
   "sign.completed",
   "sign.rejected",
+  "social.follow_accepted",
+  "social.bio_updated",
+  "social.fundraiser_drafted"
 ];
 
 export const EVENT_REQUIRED_PROPS: Record<EventName, string[]> = {
@@ -58,6 +61,9 @@ export const EVENT_REQUIRED_PROPS: Record<EventName, string[]> = {
   "sign.requested": ["intentId", "walletRole"],
   "sign.completed": ["intentId", "signature"],
   "sign.rejected": ["intentId"],
+  "social.follow_accepted": ["platform"],
+  "social.bio_updated": ["platform", "changeReason"],
+  "social.fundraiser_drafted": ["count"],
 };
 
 export function assertEventProps(name: EventName, props: Record<string, unknown>): void {

@@ -1,0 +1,38 @@
+services:
+  griffty:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: griffty
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    volumes:
+      - griffty_data:/data
+      - ./secrets:/run/secrets:ro
+    environment:
+      - GRIFFTY_STORE=file
+      - GRIFFTY_STATE_DIR=/data/.griffty
+      - OPERATOR_TOKEN=${OPERATOR_TOKEN:-dev-operator-token}
+      - XAI_API_KEY=${XAI_API_KEY:-}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-griffty}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # Optional: Firebase emulator for Firestore mode
+  # Uncomment to use GRIFFTY_STORE=firestore locally
+  # firestore-emulator:
+  #   image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+  #   command: gcloud emulators firestore start --host-port=0.0.0.0:8080
+  #   ports:
+  #     - "8080:8080"
+
+volumes:
+  griffty_data:
+    driver: local

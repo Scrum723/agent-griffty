@@ -10,9 +10,15 @@ export type SourceClass =
   | "learn_earn"
   | "airdrop"
   | "owned_media"
+  | "owned_media_monetize"
+  | "panel_research"
+  | "depin_node"
+  | "affiliate"
+  | "music_rights"
+  | "social_post"
   | "other";
 
-export type CompensationAsset = "USD" | "PAYPAL" | "GIFT" | "TOKEN" | "POINTS" | "OTHER";
+export type CompensationAsset = "USD" | "PAYPAL" | "GIFT" | "TOKEN" | "POINTS" | "STRIPE" | "ACH" | "ROYALTY" | "OTHER";
 export type Decision = "execute" | "queue" | "watch" | "reject";
 export type OpportunityStatus =
   | "discovered"
@@ -35,7 +41,8 @@ export type AgentName =
   | "treasury"
   | "ads_ops"
   | "risk"
-  | "creative";
+  | "creative"
+  | "social";
 
 export type AdsPlatform = "google" | "meta" | "tiktok" | "x" | "shopify" | "other";
 export type CampaignKind = "prospecting" | "retargeting" | "branded";
@@ -299,7 +306,10 @@ export type EventName =
   | "operator.approval_granted"
   | "sign.requested"
   | "sign.completed"
-  | "sign.rejected";
+  | "sign.rejected"
+  | "social.follow_accepted"
+  | "social.bio_updated"
+  | "social.fundraiser_drafted";
 
 export interface KpiDaily {
   date: string;
@@ -332,7 +342,50 @@ export interface OperatorProfile {
   geo: string;
   availableMinutesToday: number;
   riskTolerance: "low" | "medium" | "high";
+  phone?: string;
+  email?: string;
   createdAt: string;
+}
+
+export interface SocialPostRecord {
+  id: string;
+  platform: string;
+  status: "draft" | "scheduled" | "published" | "rejected";
+  content: string;
+  mediaUrls: string[];
+  altText: string;
+  captions: string;
+  scheduledAt?: string;
+  publishedAt?: string;
+}
+
+export interface NotificationRecord {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface TrackRecord {
+  id: string;
+  title: string;
+  isrc: string | null;
+  distributor: 'distrokid';
+  releaseDate: string | null;
+  proWorkNumber: string | null;
+  proName: 'BMI' | 'ASCAP' | 'SESAC' | null;
+  platforms: string[];
+  contentIdRegistered: boolean;
+  claimHistory: { date: string; platform: string; claimant: string; status: 'disputed' | 'won' | 'lost' | 'pending' }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IpVault {
+  tracks: TrackRecord[];
+  lastAuditAt: string | null;
 }
 
 export interface WorldState {
@@ -351,7 +404,10 @@ export interface WorldState {
   platforms: PlatformRecord[];
   kpiDaily: KpiDaily[];
   signIntents: SignIntent[];
+  socialPosts: SocialPostRecord[];
+  notifications: NotificationRecord[];
   killSwitch: KillSwitchState;
+  ipVault: IpVault;
   cycleId: string;
   updatedAt: string;
 }

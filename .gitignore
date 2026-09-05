@@ -13,3 +13,21 @@ secrets/
 *.pem
 *.p12
 .grok
+
+# Distribution
+dist/
+*.dmg
+*.exe
+*.AppImage
+
+# Docker
+docker-compose.override.yml
+
+# Secrets
+secrets/
+*.pem
+*.key
+
+# Electron builder
+app-builds/
+release/

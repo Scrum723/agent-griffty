@@ -219,6 +219,53 @@ app.post("/api/wallets", async (c) => {
   }
 });
 
+app.post("/api/social/posts/:id/approve", async (c) => {
+  const id = c.req.param("id");
+  const world = await store.load();
+  const post = world.socialPosts?.find((p) => p.id === id);
+  if (!post) return c.json({ error: "post not found" }, 404);
+  post.status = "published";
+  post.publishedAt = new Date().toISOString();
+  world.events.push({
+    id: newId("evt"),
+    name: "operator.approval_granted",
+    ts: post.publishedAt,
+    uid: world.operator.uid,
+    cycleId: world.cycleId,
+    props: { gateType: "social_media_post", subjectId: post.id, platform: post.platform },
+  });
+  await store.save(world);
+  return c.json({ ok: true, post });
+});
+
+app.post("/api/social/posts/:id/reject", async (c) => {
+  const id = c.req.param("id");
+  const world = await store.load();
+  const post = world.socialPosts?.find((p) => p.id === id);
+  if (!post) return c.json({ error: "post not found" }, 404);
+  post.status = "rejected";
+  world.events.push({
+    id: newId("evt"),
+    name: "operator.approval_granted",
+    ts: new Date().toISOString(),
+    uid: world.operator.uid,
+    cycleId: world.cycleId,
+    props: { gateType: "social_media_post_rejected", subjectId: post.id, platform: post.platform },
+  });
+  await store.save(world);
+  return c.json({ ok: true, post });
+});
+
+app.post("/api/ip-vault/audit", async (c) => {
+  const world = await store.load();
+  if (!world.ipVault) {
+    world.ipVault = { tracks: [], lastAuditAt: null };
+  }
+  world.ipVault.lastAuditAt = new Date().toISOString();
+  await store.save(world);
+  return c.json({ ok: true, ipVault: world.ipVault });
+});
+
 const port = Number(process.env.PORT ?? 8787);
 console.log(`Agent Griffty API on http://127.0.0.1:${port}`);
 

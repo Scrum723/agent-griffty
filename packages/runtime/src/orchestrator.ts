@@ -1,3 +1,4 @@
+import { publishWeeklyFundraiser } from "./social-agent.js";
 import {
   assertEventProps,
   containsRawSecret,
@@ -24,6 +25,7 @@ import { draftCreatives } from "./creative.js";
 import { queueSignIntent } from "./sign.js";
 import { adsBalanceTotal, applyFloorProtection, evaluateTreasury } from "./treasury.js";
 import { PROMPT_VERSION } from "@griffty/prompts";
+
 
 function emit(
   world: WorldState,
@@ -281,6 +283,19 @@ export async function runCycle(world: WorldState): Promise<CycleResult> {
   else world.kpiDaily.push(kpiRow);
 
   world.creatives = draftCreatives(world);
+  
+  // Social agent: generate weekly fundraiser draft on Sundays (day 0)
+  const dayOfWeek = new Date().getDay();
+  if (dayOfWeek === 0) {
+    const fundraiserPosts = publishWeeklyFundraiser(world, {
+      givesendgo: 'https://www.givesendgo.com/theweatherman',
+      general: 'https://www.givesendgo.com/theweatherman',
+    });
+    if (fundraiserPosts.length) {
+      emit(world, 'social.fundraiser_drafted', { count: fundraiserPosts.length }, cycleId);
+    }
+  }
+
   world.killSwitch = evaluateKillSwitch(world);
 
   const dispatch: OrchestratorPlan["dispatch"] = [
@@ -290,7 +305,9 @@ export async function runCycle(world: WorldState): Promise<CycleResult> {
     { agent: "executor", priority: 70, objective: "Queue safe work", payload: {} },
     { agent: "treasury", priority: 100, objective: "Enforce ads floor", payload: { floor_status: treasury.floor_status } },
     { agent: "ads_ops", priority: 85, objective: "Pause prospecting if floor threatened", payload: {} },
+    { agent: 'social', priority: 75, objective: 'Draft content, auto-reply DMs, bio optimization', payload: { postCount: world.socialPosts.filter(p => p.status === 'draft').length } }
   ];
+
 
   const plan: OrchestratorPlan = {
     cycle_id: cycleId,

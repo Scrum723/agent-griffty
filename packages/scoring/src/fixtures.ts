@@ -197,6 +197,91 @@ export const FIXTURE_VERIFIED_AIRDROP = base({
   pPayout: 0.4,
 });
 
+export const FIXTURE_YOUTUBE_MONETIZE = base({
+  id: "fix_youtube",
+  source: "youtube",
+  sourceClass: "owned_media_monetize",
+  title: "YouTube Monetization",
+  url: "https://studio.youtube.com",
+  compensationText: "$6/day",
+  compensationEstimateUsd: 6,
+  compensationAsset: "USD",
+  timeEstimateMinutes: 0,
+  incrementalMinutes: 0,
+  enrolledPlatform: true,
+  documentedRate: true,
+  pPayout: 0.85,
+  establishedPayoutHistory: true,
+});
+
+export const FIXTURE_PROLIFIC_PANEL = base({
+  id: "fix_prolific",
+  source: "prolific",
+  sourceClass: "panel_research",
+  title: "Prolific Academic Study",
+  url: "https://app.prolific.com",
+  compensationText: "$12 USD for 30 min",
+  compensationEstimateUsd: 12,
+  compensationAsset: "USD",
+  timeEstimateMinutes: 30,
+  incrementalMinutes: 30,
+  kycRequired: false,
+  enrolledPlatform: true,
+  pPayout: 0.9,
+  documentedRate: true,
+  establishedPayoutHistory: false,
+});
+
+export const FIXTURE_GRASS_NODE = base({
+  id: "fix_grass",
+  source: "grassio",
+  sourceClass: "depin_node",
+  title: "Grass.io Bandwidth Node",
+  url: "https://app.getgrass.io",
+  compensationText: "$0.25/day",
+  compensationEstimateUsd: 0.25,
+  compensationAsset: "USD",
+  timeEstimateMinutes: 0,
+  incrementalMinutes: 0,
+  enrolledPlatform: true,
+  pPayout: 0.85,
+  documentedRate: false,
+});
+
+export const FIXTURE_AMAZON_AFFILIATE = base({
+  id: "fix_amazon",
+  source: "amazon_associates",
+  sourceClass: "affiliate",
+  title: "Amazon Associates Commission",
+  url: "https://affiliate-program.amazon.com",
+  compensationText: "$4 commission",
+  compensationEstimateUsd: 4,
+  compensationAsset: "USD",
+  timeEstimateMinutes: 0,
+  incrementalMinutes: 0,
+  enrolledPlatform: true,
+  pPayout: 0.8,
+  documentedRate: true,
+  establishedPayoutHistory: false,
+});
+
+export const FIXTURE_MUSIC_SYNC_DEAL = base({
+  id: "fix_sync",
+  source: "disco_fm",
+  sourceClass: "music_rights",
+  title: "DISCO.fm Sync Deal",
+  url: "https://disco.ac",
+  compensationText: "$500 upfront",
+  compensationEstimateUsd: 500,
+  compensationAsset: "USD",
+  timeEstimateMinutes: 30,
+  incrementalMinutes: 30,
+  enrolledPlatform: true,
+  pPayout: 0.6,
+  documentedRate: false,
+  rawNotes: "sync licensing deal for film production",
+});
+
 export const GOLDEN_FIXTURES = [
   FIXTURE_PREMIUM_INTERVIEW,
   FIXTURE_SWAGBUCKS,
@@ -204,4 +289,10 @@ export const GOLDEN_FIXTURES = [
   FIXTURE_PREPAID_AIRDROP,
   FIXTURE_LEARN_EARN,
   FIXTURE_WEATHER,
+  FIXTURE_YOUTUBE_MONETIZE,
+  FIXTURE_PROLIFIC_PANEL,
+  FIXTURE_GRASS_NODE,
+  FIXTURE_AMAZON_AFFILIATE,
+  FIXTURE_MUSIC_SYNC_DEAL,
+
 ] as const;

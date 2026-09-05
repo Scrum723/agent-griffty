@@ -1,11 +1,11 @@
 {
   "name": "agent-griffty",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "description": "Agent Griffty — opportunity discovery, qualification, treasury, and paid distribution",
   "type": "module",
   "workspaces": [
     "apps/*",
+    "apps/electron",
     "packages/*",
     "functions"
   ],
@@ -19,7 +19,16 @@
     "dev": "npm run dev:server & npm run dev:dashboard",
     "dev:server": "GRIFFTY_STATE_DIR=.griffty npm run dev --workspace=@griffty/server",
     "dev:dashboard": "npm run dev --workspace=@griffty/dashboard",
+    "build": "npm run build --workspace=@griffty/server && npm run build --workspace=@griffty/dashboard",
+    "docker:build": "docker build -t griffty .",
+    "docker:up": "docker compose up",
+    "griffty": "tsx bin/griffty.ts",
+    "electron:dev": "npm run dev:server & npm run dev:dashboard & sleep 3 && npm run start --workspace=@griffty/electron",
+    "electron:dist": "npm run build && npm run dist --workspace=@griffty/electron",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "bin": {
+    "griffty": "./bin/griffty.ts"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

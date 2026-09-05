@@ -46,6 +46,7 @@ export interface WorldState {
     type: string;
     amountUsd: number;
     platform: string;
+    asset?: string;
     settled: boolean;
     createdAt: string;
   }[];
@@ -60,6 +61,15 @@ export interface WorldState {
   }[];
   alerts: { id: string; severity: string; code: string; message: string; acked: boolean }[];
   events: { id: string; name: string; ts: string; props: Record<string, unknown> }[];
+  platforms: {
+    id: string;
+    name: string;
+    tier: string;
+    enrolled: boolean;
+    kycStatus: string;
+    lastPayoutAt: string | null;
+    residualValueUsd: number;
+  }[];
   kpiDaily: {
     date: string;
     harvestUsd: number;
@@ -78,6 +88,26 @@ export interface WorldState {
     walletRole: string;
     summary: string;
   }[];
+  socialPosts?: {
+    id: string;
+    platform: string;
+    status: "draft" | "scheduled" | "published" | "rejected";
+    content: string;
+    altText: string;
+    captions: string;
+    scheduledAt?: string;
+  }[];
+  ipVault?: {
+    lastAuditAt: string | null;
+    tracks: {
+      id: string;
+      title: string;
+      isrc: string | null;
+      proWorkNumber: string | null;
+      contentIdRegistered: boolean;
+      platforms: string[];
+    }[];
+  };
   killSwitch: { active: boolean; reasons: string[] };
   cycleId: string;
   updatedAt: string;

@@ -11,6 +11,19 @@ export interface ConnectorFlags {
   adsTiktok: boolean;
   adsX: boolean;
   shopify: boolean;
+  userTesting: boolean;
+  dscout: boolean;
+  grassio: boolean;
+  nodepay: boolean;
+  amazonAssociates: boolean;
+  youtubeMonetize: boolean;
+  tiktokLive: boolean;
+  spotifyPodcast: boolean;
+  distrokid: boolean;
+  socialX: boolean;
+  socialTiktok: boolean;
+  socialMeta: boolean;
+  socialYoutube: boolean;
 }
 
 function bool(name: string): boolean {
@@ -31,6 +44,19 @@ export function connectorFlags(): ConnectorFlags {
     adsTiktok: bool("CONNECTOR_ADS_TIKTOK"),
     adsX: bool("CONNECTOR_ADS_X"),
     shopify: bool("CONNECTOR_SHOPIFY"),
+    userTesting: bool("CONNECTOR_USER_TESTING"),
+    dscout: bool("CONNECTOR_DSCOUT"),
+    grassio: bool("CONNECTOR_GRASSIO"),
+    nodepay: bool("CONNECTOR_NODEPAY"),
+    amazonAssociates: bool("CONNECTOR_AMAZON_ASSOCIATES"),
+    youtubeMonetize: bool("CONNECTOR_YOUTUBE_MONETIZE"),
+    tiktokLive: bool("CONNECTOR_TIKTOK_LIVE"),
+    spotifyPodcast: bool("CONNECTOR_SPOTIFY_PODCAST"),
+    distrokid: bool("CONNECTOR_DISTROKID"),
+    socialX: bool("CONNECTOR_SOCIAL_X"),
+    socialTiktok: bool("CONNECTOR_SOCIAL_TIKTOK"),
+    socialMeta: bool("CONNECTOR_SOCIAL_META"),
+    socialYoutube: bool("CONNECTOR_SOCIAL_YOUTUBE"),
   };
 }
 
