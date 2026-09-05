@@ -16,6 +16,7 @@ export type SourceClass =
   | "affiliate"
   | "music_rights"
   | "social_post"
+  | "grant_funding"
   | "other";
 
 export type CompensationAsset = "USD" | "PAYPAL" | "GIFT" | "TOKEN" | "POINTS" | "STRIPE" | "ACH" | "ROYALTY" | "OTHER";
@@ -42,7 +43,8 @@ export type AgentName =
   | "ads_ops"
   | "risk"
   | "creative"
-  | "social";
+  | "social"
+  | "grant";
 
 export type AdsPlatform = "google" | "meta" | "tiktok" | "x" | "shopify" | "other";
 export type CampaignKind = "prospecting" | "retargeting" | "branded";

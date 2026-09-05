@@ -1,4 +1,5 @@
 import { publishWeeklyFundraiser } from "./social-agent.js";
+import { runGrantAgent } from "./grant-agent.js";
 import {
   assertEventProps,
   containsRawSecret,
@@ -301,6 +302,9 @@ export async function runCycle(world: WorldState): Promise<CycleResult> {
 
   world.killSwitch = evaluateKillSwitch(world);
 
+  // Huge Grant Agent: search, deliberate, and draft applications for relevant grants
+  const grantStats = runGrantAgent(world);
+
   const dispatch: OrchestratorPlan["dispatch"] = [
     { agent: "scout", priority: 80, objective: "Ingest allow-listed sources", payload: { count: fresh.length } },
     { agent: "qualifier", priority: 90, objective: "Score new opportunities", payload: { count: qualifierResults.length } },
@@ -308,7 +312,8 @@ export async function runCycle(world: WorldState): Promise<CycleResult> {
     { agent: "executor", priority: 70, objective: "Queue safe work", payload: {} },
     { agent: "treasury", priority: 100, objective: "Enforce ads floor", payload: { floor_status: treasury.floor_status } },
     { agent: "ads_ops", priority: 85, objective: "Pause prospecting if floor threatened", payload: {} },
-    { agent: 'social', priority: 75, objective: 'Draft content, auto-reply DMs, bio optimization', payload: { postCount: world.socialPosts.filter(p => p.status === 'draft').length } }
+    { agent: 'social', priority: 75, objective: 'Draft content, auto-reply DMs, bio optimization', payload: { postCount: world.socialPosts.filter(p => p.status === 'draft').length } },
+    { agent: 'grant', priority: 65, objective: 'Search, deliberate, and prepare grant applications', payload: { scouted: grantStats.scouted, drafted: grantStats.applicationsDrafted } },
   ];
 
 
