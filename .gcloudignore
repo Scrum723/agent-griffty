@@ -1,0 +1,9 @@
+.gcloudignore
+.git/
+node_modules/
+dist/
+apps/dashboard/dist/
+app-builds/
+release/
+*.log
+.DS_Store

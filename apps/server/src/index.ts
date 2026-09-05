@@ -266,6 +266,14 @@ app.post("/api/ip-vault/audit", async (c) => {
   return c.json({ ok: true, ipVault: world.ipVault });
 });
 
+import { serveStatic } from "@hono/node-server/serve-static";
+import { existsSync } from "node:fs";
+
+if (existsSync("./apps/dashboard/dist")) {
+  app.use("/*", serveStatic({ root: "./apps/dashboard/dist" }));
+  app.get("*", serveStatic({ path: "./apps/dashboard/dist/index.html" }));
+}
+
 const port = Number(process.env.PORT ?? 8787);
 console.log(`Agent Griffty API on http://127.0.0.1:${port}`);
 

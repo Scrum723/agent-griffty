@@ -7,6 +7,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/server/package.json ./apps/server/
 COPY apps/dashboard/package.json ./apps/dashboard/
+COPY apps/electron/package.json ./apps/electron/
+COPY functions/package.json ./functions/
 COPY packages/domain/package.json ./packages/domain/
 COPY packages/scoring/package.json ./packages/scoring/
 COPY packages/connectors/package.json ./packages/connectors/
@@ -20,15 +22,16 @@ RUN npm ci --ignore-scripts
 COPY . .
 
 # Build dashboard static assets
-RUN npm run build --workspace=@griffty/dashboard || echo 'Dashboard build skipped (no build script yet)'
+RUN npm run build --workspace=@griffty/dashboard
 
 # ---- Stage 2: Production ----
 FROM node:20-slim AS production
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV GRIFFTY_STORE=file
+ENV GRIFFTY_STORE=firestore
 ENV GRIFFTY_STATE_DIR=/data/.griffty
+ENV PORT=8080
 
 # Only copy production deps + built artifacts
 COPY --from=builder /app/node_modules ./node_modules
@@ -38,10 +41,11 @@ COPY --from=builder /app/apps/dashboard ./apps/dashboard
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/.griffty ./.griffty
 
 # Persistent state volume
 VOLUME ["/data"]
 
-EXPOSE 8787
+EXPOSE 8080
 
 CMD ["node", "--import", "tsx/esm", "apps/server/src/index.ts"]

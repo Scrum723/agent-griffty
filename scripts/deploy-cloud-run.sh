@@ -6,6 +6,9 @@ set -euo pipefail
 # Project: griffty (Google Cloud & Firebase)
 # ==============================================================================
 
+export CLOUDSDK_PYTHON="${CLOUDSDK_PYTHON:-/Library/Frameworks/Python.framework/Versions/3.13/bin/python3}"
+export PATH="/opt/homebrew/bin:/Users/charlesclottin/google-cloud-sdk/bin:$PATH"
+
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-griffty}"
 REGION="us-central1"
 SERVICE_NAME="agent-griffty"
@@ -34,7 +37,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --min-instances 0 \
   --max-instances 1 \
   --memory 512Mi \
-  --set-env-vars "NODE_ENV=production,GRIFFTY_STORE=firestore,GCLOUD_PROJECT=$PROJECT_ID,OPERATOR_TOKEN=dev-operator-token"
+  --set-env-vars "NODE_ENV=production,GRIFFTY_STORE=firestore,GCLOUD_PROJECT=$PROJECT_ID,OPERATOR_TOKEN=dev-operator-token,OPERATOR_PHONE=585-880-4569,OPERATOR_EMAIL=cclottin@gmail.com,GIVESENDGO_URL=https://www.givesendgo.com/graduate-r-d-and-creator-bridging-the-ga,GOFUNDME_URL=https://www.gofundme.com/f/help-charles-bridge-the-gap-j8uh2"
 
 # 4. Get Cloud Run Service URL
 SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --platform managed --region "$REGION" --format 'value(status.url)')

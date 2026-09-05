@@ -52,7 +52,20 @@ export class FirestoreStore implements GrifftyStore {
     const firestore = db();
     const metaSnap = await firestore.doc("world/current").get();
     const base = emptyWorld();
-    if (!metaSnap.exists) return base;
+    if (!metaSnap.exists) {
+      const stateFile = process.env.GRIFFTY_SEED_FILE ?? ".griffty/state.json";
+      try {
+        const { existsSync, readFileSync } = await import("node:fs");
+        if (existsSync(stateFile)) {
+          const raw = JSON.parse(readFileSync(stateFile, "utf-8")) as WorldState;
+          await this.save(raw);
+          return raw;
+        }
+      } catch {
+        // fallback to base empty world
+      }
+      return base;
+    }
     const meta = metaSnap.data() as Partial<WorldState>;
 
     const pull = async <T,>(name: string): Promise<T[]> => {
@@ -73,6 +86,8 @@ export class FirestoreStore implements GrifftyStore {
       events,
       kpiDaily,
       signIntents,
+      socialPosts,
+      notifications,
     ] = await Promise.all([
       pull("platforms"),
       pull("opportunities"),
@@ -86,6 +101,8 @@ export class FirestoreStore implements GrifftyStore {
       pull("events"),
       pull("kpiDaily"),
       pull("signIntents"),
+      pull("socialPosts"),
+      pull("notifications"),
     ]);
 
     return {
@@ -105,6 +122,9 @@ export class FirestoreStore implements GrifftyStore {
       events: (events as WorldState["events"]).sort((a, b) => a.ts.localeCompare(b.ts)),
       kpiDaily: kpiDaily as WorldState["kpiDaily"],
       signIntents: (signIntents as WorldState["signIntents"]) ?? [],
+      socialPosts: (socialPosts as WorldState["socialPosts"]) ?? [],
+      notifications: (notifications as WorldState["notifications"]) ?? [],
+      ipVault: (meta.ipVault as WorldState["ipVault"]) ?? base.ipVault ?? { tracks: [], lastAuditAt: null },
     };
   }
 
@@ -138,6 +158,8 @@ export class FirestoreStore implements GrifftyStore {
     for (const e of world.events) put("events", e.id, { ...e, name: e.name, ts: e.ts, uid: e.uid, cycleId: e.cycleId, props: e.props });
     for (const k of world.kpiDaily) put("kpiDaily", k.date, k);
     for (const s of world.signIntents ?? []) put("signIntents", s.id, s);
+    for (const sp of world.socialPosts ?? []) put("socialPosts", sp.id, sp);
+    for (const n of world.notifications ?? []) put("notifications", n.id, n);
 
     mutators.push((batch) => {
       batch.set(
@@ -149,6 +171,7 @@ export class FirestoreStore implements GrifftyStore {
           killSwitch: world.killSwitch,
           cycleId: world.cycleId,
           updatedAt: world.updatedAt,
+          ipVault: world.ipVault ?? { tracks: [], lastAuditAt: null },
           store: "firestore",
           projectId: cloudProjectId(),
         }),
