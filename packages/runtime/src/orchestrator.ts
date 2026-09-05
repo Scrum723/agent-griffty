@@ -287,9 +287,12 @@ export async function runCycle(world: WorldState): Promise<CycleResult> {
   // Social agent: generate weekly fundraiser draft on Sundays (day 0)
   const dayOfWeek = new Date().getDay();
   if (dayOfWeek === 0) {
+    const gsg = process.env.GIVESENDGO_URL || 'https://www.givesendgo.com/graduate-r-d-and-creator-bridging-the-ga';
+    const gfm = process.env.GOFUNDME_URL || 'https://www.gofundme.com/f/help-charles-bridge-the-gap-j8uh2';
     const fundraiserPosts = publishWeeklyFundraiser(world, {
-      givesendgo: 'https://www.givesendgo.com/theweatherman',
-      general: 'https://www.givesendgo.com/theweatherman',
+      givesendgo: gsg,
+      gofundme: gfm,
+      general: gsg,
     });
     if (fundraiserPosts.length) {
       emit(world, 'social.fundraiser_drafted', { count: fundraiserPosts.length }, cycleId);

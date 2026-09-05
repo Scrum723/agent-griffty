@@ -62,7 +62,9 @@ export function autoReplyDm(
   let reply = 'Thanks for reaching out! We will get back to you soon.';
 
   if (msg.includes('donate') || msg.includes('support')) {
-    reply = 'Thank you for your support! You can donate here: https://www.givesendgo.com/theweatherman';
+    const gsg = process.env.GIVESENDGO_URL || 'https://www.givesendgo.com/graduate-r-d-and-creator-bridging-the-ga';
+    const gfm = process.env.GOFUNDME_URL || 'https://www.gofundme.com/f/help-charles-bridge-the-gap-j8uh2';
+    reply = `Thank you for your support! You can donate to our campaign here: ${gsg} or on GoFundMe: ${gfm}`;
   } else if (msg.includes('weather') || msg.includes('forecast')) {
     reply = 'Check out the latest forecast at Doc Weather: https://docweather.com';
   } else if (msg.includes('music') || msg.includes('song')) {
