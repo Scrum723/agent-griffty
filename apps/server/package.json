@@ -1,0 +1,19 @@
+{
+  "name": "@griffty/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@griffty/connectors": "*",
+    "@griffty/domain": "*",
+    "@griffty/runtime": "*",
+    "@griffty/store": "*",
+    "@hono/node-server": "^1.19.1",
+    "@solana/web3.js": "^1.98.4",
+    "hono": "^4.9.6"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@griffty/functions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "cycle": "tsx src/local.ts"
+  },
+  "dependencies": {
+    "@griffty/runtime": "*",
+    "@griffty/store": "*"
+  }
+}

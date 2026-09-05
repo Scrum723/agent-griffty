@@ -1,0 +1,21 @@
+{
+  "adsFloorUsd": 100,
+  "adsBufferUsd": 25,
+  "stretchTargetUsd": 50,
+  "humanGateUsd": 75,
+  "zeroCapital": true,
+  "allowGasOnKnownChains": true,
+  "allowAirdropAutoClaim": false,
+  "allowVerifiedAirdrops": true,
+  "allowWalletConnectSign": true,
+  "allowUnattendedSign": true,
+  "allowAgentWalletAutonomy": true,
+  "agentWalletSolana": "2f2RxyqM4YZHRChncDHxkWvSetZMx4CxYB9rW9BAsZuV",
+  "pauseProspectingOnFloorWatch": true,
+  "dailyProfitSweepPct": 0.5,
+  "dailyProfitSweepTo": "FigKNbrXoMmnonsrBfPgHCS8FKGPMZ7X5zXMY1dCCG2Z",
+  "dailyProfitSweepMinUsd": 0.5,
+  "moonSleevePct": 0.25,
+  "grokBuildLoops": false,
+  "darkWebEnabled": false
+}

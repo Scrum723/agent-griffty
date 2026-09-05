@@ -1,0 +1,33 @@
+{
+  "name": "agent-griffty",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent Griffty — opportunity discovery, qualification, treasury, and paid distribution",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "functions"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cycle": "tsx scripts/run-cycle.ts",
+    "seed": "tsx scripts/seed.ts",
+    "sandbox": "tsx scripts/sandbox-firestore.ts",
+    "daily": "tsx scripts/daily-profit-marker.ts",
+    "dev": "npm run dev:server & npm run dev:dashboard",
+    "dev:server": "GRIFFTY_STATE_DIR=.griffty npm run dev --workspace=@griffty/server",
+    "dev:dashboard": "npm run dev --workspace=@griffty/dashboard",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

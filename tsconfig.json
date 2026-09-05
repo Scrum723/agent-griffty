@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "paths": {
+      "@griffty/domain": ["./packages/domain/src/index.ts"],
+      "@griffty/scoring": ["./packages/scoring/src/index.ts"],
+      "@griffty/prompts": ["./packages/prompts/src/index.ts"],
+      "@griffty/connectors": ["./packages/connectors/src/index.ts"],
+      "@griffty/runtime": ["./packages/runtime/src/index.ts"],
+      "@griffty/store": ["./packages/store/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/**/*.ts",
+    "apps/server/src/**/*.ts",
+    "functions/src/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist", "apps/dashboard", "functions"]
+}
