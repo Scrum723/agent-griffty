@@ -489,35 +489,62 @@ function OppTable({ rows }: { rows: WorldState["opportunities"] }) {
       <thead>
         <tr>
           <th>Source</th>
-          <th>Title</th>
+          <th>Title & Portal</th>
           <th>EV</th>
           <th>Time</th>
           <th>Decision</th>
           <th>Codes</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         {rows.map((o) => (
           <tr key={o.id}>
             <td>
-              {o.source}
+              <div style={{ fontWeight: 600 }}>{o.source}</div>
               <span className="pill watch" aria-label={`Source class: ${o.sourceClass}`}>{o.sourceClass}</span>
             </td>
             <td>
-              {o.title}
-              {o.humanGate ? <span className="pill blocked">gate</span> : null}
+              {o.url ? (
+                <a
+                  href={o.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#38bdf8", textDecoration: "underline", fontWeight: 600, display: "inline-block", marginRight: 6 }}
+                  aria-label={`Open ${o.title} at ${o.url}`}
+                >
+                  {o.title} ↗
+                </a>
+              ) : (
+                <span>{o.title}</span>
+              )}
+              {o.humanGate ? <span className="pill blocked">GATE</span> : null}
             </td>
             <td className="mono">{money(o.expectedNetUsd)}</td>
             <td className="mono">{o.timeEstimateMinutes ?? "—"}m</td>
             <td>
               <span className={`pill ${o.decision}`}>{o.decision}</span>
             </td>
-            <td className="mono dim">{o.reasonCodes.slice(0, 3).join(", ")}</td>
+            <td className="mono dim" style={{ fontSize: "0.85em" }}>{o.reasonCodes.slice(0, 3).join(", ")}</td>
+            <td>
+              {o.url && (
+                <a
+                  href={o.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pill execute"
+                  style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 8px", whiteSpace: "nowrap" }}
+                  aria-label={`Open portal for ${o.title}`}
+                >
+                  Open ↗
+                </a>
+              )}
+            </td>
           </tr>
         ))}
         {rows.length === 0 && (
           <tr>
-            <td colSpan={6} className="dim">
+            <td colSpan={7} className="dim">
               No rows.
             </td>
           </tr>
