@@ -31,3 +31,6 @@ secrets/
 # Electron builder
 app-builds/
 release/
+
+# Private Operator Catalog Data
+*BMI_WORKS_BULK_UPLOAD.csv

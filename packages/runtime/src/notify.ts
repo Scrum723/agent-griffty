@@ -47,7 +47,7 @@ export async function proposeCryptoTransaction(
   proposal: CryptoProposal
 ): Promise<NotificationRecord> {
   const proposalId = proposal.id || newId("crypto_tx");
-  const phone = world.operator.phone || process.env.OPERATOR_PHONE || "585-880-4569";
+  const phone = world.operator.phone || process.env.OPERATOR_PHONE || "555-0100";
 
   const smsText = `[GRIFFTY CRYPTO ALERT]
 Action: ${proposal.direction.toUpperCase()} ${proposal.amount} ${proposal.asset} on ${proposal.exchange} (~$${proposal.estimatedValueUsd.toFixed(2)})

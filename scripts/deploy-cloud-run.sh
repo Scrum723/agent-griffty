@@ -38,7 +38,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --max-instances 1 \
   --memory 512Mi \
   --quiet \
-  --set-env-vars "NODE_ENV=production,GRIFFTY_STORE=firestore,GCLOUD_PROJECT=$PROJECT_ID,OPERATOR_TOKEN=dev-operator-token,OPERATOR_PHONE=585-880-4569,OPERATOR_EMAIL=cclottin@gmail.com,GIVESENDGO_URL=https://www.givesendgo.com/graduate-r-d-and-creator-bridging-the-ga,GOFUNDME_URL=https://www.gofundme.com/f/help-charles-bridge-the-gap-j8uh2"
+  --set-env-vars "NODE_ENV=production,GRIFFTY_STORE=firestore,GCLOUD_PROJECT=$PROJECT_ID,OPERATOR_TOKEN=${OPERATOR_TOKEN:-dev-operator-token},OPERATOR_PHONE=${OPERATOR_PHONE:-},OPERATOR_EMAIL=${OPERATOR_EMAIL:-},GIVESENDGO_URL=${GIVESENDGO_URL:-},GOFUNDME_URL=${GOFUNDME_URL:-}"
 
 # 4. Get Cloud Run Service URL
 SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --platform managed --region "$REGION" --format 'value(status.url)')

@@ -175,14 +175,14 @@ export function deliberateGrant(_world: WorldState, grant: GrantOpportunity): Gr
  */
 export function applyGrant(world: WorldState, grantId: string): GrantApplicationPackage {
   const grant = ACTIVE_GRANTS_INDEX.find(g => g.id === grantId) || ACTIVE_GRANTS_INDEX[0];
-  const email = world.operator.email || "cclottin@gmail.com";
-  const phone = world.operator.phone || "585-880-4569";
+  const email = world.operator.email || process.env.OPERATOR_EMAIL || "operator@example.com";
+  const phone = world.operator.phone || process.env.OPERATOR_PHONE || "555-0100";
 
   return {
     grantId: grant.id,
     projectTitle: "When the Lake-Effect Shift Hits the Warehouse Floor: Climate Vulnerability & Logistics",
     applicant: {
-      name: world.operator.displayName || "Charles Clottin",
+      name: world.operator.displayName || "Operator",
       brand: "Doc Weather / The Weatherman",
       email,
       phone,
@@ -232,11 +232,14 @@ export function respondToGrantInquiry(world: WorldState, inquiry: GrantInquiry):
     responseBody += `Thank you for the update. We remain fully committed to this project and look forward to your decision.\n\n`;
   }
 
-  responseBody += `Sincerely,\nCharles Clottin\nFounder, Doc Weather & The Weatherman\nPhone: ${world.operator.phone || "585-880-4569"}\nEmail: ${world.operator.email || "cclottin@gmail.com"}`;
+  const opName = world.operator.displayName || "Operator";
+  const opPhone = world.operator.phone || process.env.OPERATOR_PHONE || "555-0100";
+  const opEmail = world.operator.email || process.env.OPERATOR_EMAIL || "operator@example.com";
+  responseBody += `Sincerely,\n${opName}\nFounder, Doc Weather & The Weatherman\nPhone: ${opPhone}\nEmail: ${opEmail}`;
 
   return {
     inquiryId: newId("inquiry_resp"),
-    subject: `RE: ${grantName} — Application Follow-Up (Charles Clottin)`,
+    subject: `RE: ${grantName} — Application Follow-Up (${opName})`,
     responseBody,
     requiresOperatorReview: true,
   };

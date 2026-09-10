@@ -13,6 +13,7 @@
     "@griffty/prompts": "*",
     "@griffty/scoring": "*",
     "@griffty/store": "*",
+    "@strands-agents/sdk": "^1.17.0",
     "openai": "^5.16.1"
   }
 }
