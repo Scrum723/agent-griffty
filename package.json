@@ -23,7 +23,7 @@
     "docker:build": "docker build -t griffty .",
     "docker:up": "docker compose up",
     "griffty": "tsx bin/griffty.ts",
-    "electron:dev": "npm run dev:server & npm run dev:dashboard & sleep 3 && npm run start --workspace=@griffty/electron",
+    "electron:dev": "./scripts/start-desktop.sh",
     "electron:dist": "npm run build && npm run dist --workspace=@griffty/electron",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
