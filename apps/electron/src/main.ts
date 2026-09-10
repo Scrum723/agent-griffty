@@ -21,6 +21,11 @@ function createWindow(): void {
       contextIsolation: true,
     },
   });
+  mainWindow.webContents.on('did-fail-load', () => {
+    setTimeout(() => {
+      if (mainWindow) mainWindow.loadURL(DASHBOARD_URL);
+    }, 1500);
+  });
   mainWindow.loadURL(DASHBOARD_URL);
   mainWindow.on('closed', () => { mainWindow = null; });
 }
@@ -45,7 +50,11 @@ ipcMain.on('notify', (_event, opts: { title: string; body: string }) => {
 app.whenReady().then(() => {
   createWindow();
   createTray();
-  autoUpdater.checkForUpdatesAndNotify();
+  if (app.isPackaged) {
+    try {
+      autoUpdater.checkForUpdatesAndNotify();
+    } catch {}
+  }
 });
 
 app.on('window-all-closed', () => {

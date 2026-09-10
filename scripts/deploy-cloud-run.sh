@@ -56,7 +56,7 @@ gcloud scheduler jobs update http griffty-cycle-trigger \
   --schedule="*/15 * * * *" \
   --uri="${SERVICE_URL}/api/cycle" \
   --http-method=POST \
-  --headers="Authorization=Bearer dev-operator-token" \
+  --update-headers="Authorization=Bearer dev-operator-token" \
   --location="$REGION"
 
 echo "✅ Deployment complete! Griffty is now operating 24/7 on Cloud Run."
