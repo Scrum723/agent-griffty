@@ -1,3 +1,5 @@
++
+
 #!/bin/bash
 # ==============================================================================
 # Agent Griffty — Desktop App Runner with Clean Lifecycle

@@ -47,6 +47,8 @@ export const api = {
     }),
   confirmIntent: (id: string, signature: string) =>
     req(`/api/intents/${id}/confirm`, { method: "POST", body: JSON.stringify({ signature }) }),
+  rejectIntent: (id: string) =>
+    req(`/api/intents/${id}/confirm`, { method: "POST", body: JSON.stringify({ rejected: true }) }),
   approveSocialPost: (id: string) => req(`/api/social/posts/${id}/approve`, { method: "POST" }),
   rejectSocialPost: (id: string) => req(`/api/social/posts/${id}/reject`, { method: "POST" }),
   auditIpVault: () => req(`/api/ip-vault/audit`, { method: "POST" }),

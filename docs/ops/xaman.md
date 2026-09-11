@@ -2,25 +2,30 @@
 
 **Public address (only identifier I will keep):** `rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4`
 
-## Ledger status (checked 2026-09-04)
+## Ledger status (validated live 2026-09-10 via XRPSCAN)
 
-XRPL `account_info` on s1.ripple.com and xrplcluster.com: **`actNotFound`**.
+- **Account Status**: **ACTIVE** (Sequence: 106759368, Inception: 2026-09-04)
+- **XRP Balance**: **16.835093 XRP** (~$9.76 USD)
+- **Reserve Breakdown**:
+  - Base account reserve: **10.00 XRP** (protocol requirement)
+  - Trustline reserve: **2.00 XRP** (for SIGMA trustline)
+  - Total locked reserve: **12.00 XRP**
+  - **Free Spendable Liquidity**: **~4.835 XRP** (~$2.80 USD)
+- **Active Trustlines**:
+  - **SIGMA** (`5349474D...`, issuer: `rfKYWZ84fm9eVEdoTcsQCo1WdqMPyaUF5z`): Balance: **6.159438 SIGMA**
+- **Recent DEX Activity**:
+  - 2026-09-10 05:55:51 UTC: Swap executed on Magnetic DEX selling 3,083,439.1 SIGMA for +12.0466 XRP.
 
-That means the r-address exists in Xaman as a keypair, but it is **not a live ledger account** until someone sends it at least the **10 XRP reserve**. Until then: no DEX, no Magnetic, no trust lines, no inbound tokens.
+## Griffty Operating Rules for Xaman & Magnetic
 
-## How I will use Xaman (no seed)
+1. **Watch-Only & Zero Seed Exposure**:
+   - Griffty only maintains the public `rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4` address.
+   - All swaps, offers, and AMM actions are generated as unsigned payloads for you to tap **Approve** inside Xaman.
+2. **Reserve Preservation Floor**:
+   - Griffty will **never** attempt a trade or swap that pushes your XRP below the 12.00 XRP reserve limit (to prevent transaction failures and locked trustline states).
+   - Available trading size: **~4.83 XRP**.
+3. **Magnetic Strategy (https://xmagnetic.org)**:
+   - **XRP/MAG & XRP/SIGMA Liquidity Monitoring**: Track low-liquidity spikes to set profitable limit sell orders on remaining tokens.
+   - **XRPL AMM Yield Pools (XLS-30d)**: Non-directional passive LP fee collection.
+   - **Micro Profit Sweeps**: When trades yield net gains, sweep profit into core treasury or hold in spot XRP.
 
-1. Watch the r-address only.
-2. When you want a swap/offer/trust line, I build the unsigned tx and you **Approve in the Xaman app** (payload / QR). I never hold the secret.
-3. Real Magnetic UI (if you use XRPL DEX): **https://xmagnetic.org** — not xmagnetic.us / vercel airdrop clones.
-
-## What you do
-
-1. Paper backup of secret numbers. Never screenshot them to chat again.
-2. After paper backup, consider this seed **exposed** (it was in this session). If you later receive XRP, move to a **new** Xaman account created offline and abandon this r-address.
-3. To activate: buy ~12 XRP (10 reserve + a little for fees) from an exchange **you** control, withdraw to `rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4`. Destination tag: none unless the exchange requires one on **their** side.
-4. Tell me when the first inbound XRP confirms. I will re-query the ledger and only then talk Magnetic/DEX.
-
-## XRP perps (separate from Xaman)
-
-Hyperliquid/Phantom already lists **XRP perps** (max 20x). That does **not** need Xaman. Griffty BTC 2x is still using ~all HL margin, so XRP perps still need extra USDC or a BTC trim. Say which.

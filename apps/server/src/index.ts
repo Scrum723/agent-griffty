@@ -126,9 +126,12 @@ app.post("/api/intents/demo", async (c) => {
 
 app.get("/api/intents", async (c) => {
   const world = await store.load();
+  const host = c.req.header("x-forwarded-host") ?? c.req.header("host") ?? "127.0.0.1:5173";
+  const proto = c.req.header("x-forwarded-proto") ?? (host.includes("localhost") || host.includes("127.0.0.1") || host.includes("192.168.") ? "http" : "https");
+  const dashUrl = process.env.DASHBOARD_URL ?? `${proto}://${host}`;
   return c.json({
     intents: world.signIntents ?? [],
-    phantomBrowse: phantomBrowseLink(process.env.DASHBOARD_URL ?? "http://127.0.0.1:5173"),
+    phantomBrowse: phantomBrowseLink(dashUrl),
   });
 });
 

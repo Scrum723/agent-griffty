@@ -11,19 +11,38 @@
   "build": {
     "appId": "com.docweather.griffty",
     "productName": "Griffty",
-    "mac": { "target": "dmg", "icon": "assets/icon.icns" },
-    "win": { "target": "nsis", "icon": "assets/icon.ico" },
-    "linux": { "target": "AppImage", "icon": "assets/icon.png" },
-    "files": ["dist/**", "assets/**"],
-    "extraResources": [{ "from": "../dashboard/dist", "to": "dashboard" }]
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    },
+    "files": [
+      "dist/**",
+      "assets/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../dashboard/dist",
+        "to": "dashboard"
+      }
+    ]
   },
   "devDependencies": {
-    "electron": "^31.0.0",
+    "@types/node": "^24.3.0",
+    "electron": "31.7.7",
     "electron-builder": "^24.0.0",
-    "typescript": "^5.9.2",
-    "@types/node": "^24.3.0"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
+    "7zip-bin": "^5.2.0",
+    "app-builder-bin": "^4.0.0",
     "electron-updater": "^6.3.0"
   }
 }

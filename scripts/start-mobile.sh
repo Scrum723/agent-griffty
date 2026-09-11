@@ -29,3 +29,4 @@ echo ""
 echo "When opened in Safari on iPhone: Tap Share -> 'Add to Home Screen' for standalone iOS app!"
 
 wait
+can we set that up 
