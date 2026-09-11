@@ -15,3 +15,4 @@ export * from "./notify.js";
 export * from "./fundraiser-ads.js";
 export * from "./grant-agent.js";
 export * from "./strands-agent.js";
+export * from "./benchmark-engine.js";

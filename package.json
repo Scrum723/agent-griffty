@@ -13,6 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cycle": "tsx scripts/run-cycle.ts",
+    "autonomous:wallets": "tsx scripts/run-autonomous-wallets.ts",
+    "autonomous:wallets:loop": "tsx scripts/run-autonomous-wallets.ts --loop",
     "seed": "tsx scripts/seed.ts",
     "sandbox": "tsx scripts/sandbox-firestore.ts",
     "daily": "tsx scripts/daily-profit-marker.ts",

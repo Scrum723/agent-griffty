@@ -6,7 +6,7 @@
   "zeroCapital": true,
   "completeallprioritized": true,
   "allowGasOnKnownChains": true,
-  "allowAirdropAutoClaim": true,
+  "allowAirdropAutoClaim": false,
   "allowAirdropAutoClaimNote": "with approval",
   "allowVerifiedAirdrops": true,
   "allowWalletConnectSign": true,
@@ -24,8 +24,15 @@
   "monitorLiquidityFor100X": true,
   "monitorSniperFor100X": true,
   "autofillgrants": true,
-  "autofillgrantsWallet": "",
+  "autofillgrantsWallet": "FigKNbrXoMmnonsrBfPgHCS8FKGPMZ7X5zXMY1dCCG2Z",
   "xamanWalletXrpl": "rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4",
   "xamanReserveFloorXrp": 12,
-  "xamanWatchOnly": true
+  "xamanWatchOnly": true,
+  "autonomousExecution": true,
+  "phantomAutonomousTrading": true,
+  "xamanAutonomousTrading": true,
+  "benchmarkStepPct": 12.5,
+  "notifyOnlyOnBenchmarks": true,
+  "lossWarningBenchmarks": [12.5, 25.0, 37.5, 50.0, 62.5, 75.0, 87.5],
+  "profitHarvestBenchmarks": [12.5, 25.0, 37.5, 50.0, 62.5, 75.0, 87.5, 100.0]
 }

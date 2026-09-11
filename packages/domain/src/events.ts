@@ -30,7 +30,10 @@ export const EVENT_NAMES: EventName[] = [
   "sign.rejected",
   "social.follow_accepted",
   "social.bio_updated",
-  "social.fundraiser_drafted"
+  "social.fundraiser_drafted",
+  "wallet.benchmark_loss",
+  "wallet.benchmark_profit",
+  "wallet.autonomous_signed",
 ];
 
 export const EVENT_REQUIRED_PROPS: Record<EventName, string[]> = {
@@ -64,6 +67,9 @@ export const EVENT_REQUIRED_PROPS: Record<EventName, string[]> = {
   "social.follow_accepted": ["platform"],
   "social.bio_updated": ["platform", "changeReason"],
   "social.fundraiser_drafted": ["count"],
+  "wallet.benchmark_loss": ["lossPct", "currentEquityUsd", "baselineUsd"],
+  "wallet.benchmark_profit": ["profitPct", "currentEquityUsd", "sweptUsd"],
+  "wallet.autonomous_signed": ["intentId", "walletRole", "signature"],
 };
 
 export function assertEventProps(name: EventName, props: Record<string, unknown>): void {

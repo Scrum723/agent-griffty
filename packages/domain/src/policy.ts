@@ -27,6 +27,15 @@ export interface StandingOrders {
   decisionExecuteMin: number;
   decisionQueueMin: number;
   decisionWatchMin: number;
+  walletFloorUsd: number;
+  xamanWalletXrpl?: string;
+  xamanReserveFloorXrp?: number;
+  xamanWatchOnly?: boolean;
+  phantomAutonomousTrading: boolean;
+  xamanAutonomousTrading: boolean;
+  autonomousExecution: boolean;
+  benchmarkStepPct: number;
+  notifyOnlyOnBenchmarks: boolean;
 }
 
 export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
@@ -52,6 +61,15 @@ export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   decisionExecuteMin: 75,
   decisionQueueMin: 55,
   decisionWatchMin: 35,
+  walletFloorUsd: 500,
+  xamanWalletXrpl: "rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4",
+  xamanReserveFloorXrp: 12,
+  xamanWatchOnly: true,
+  phantomAutonomousTrading: true,
+  xamanAutonomousTrading: true,
+  autonomousExecution: true,
+  benchmarkStepPct: 12.5,
+  notifyOnlyOnBenchmarks: true,
 }) as StandingOrders;
 
 export function parseStandingOrders(

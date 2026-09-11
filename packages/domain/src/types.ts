@@ -228,8 +228,8 @@ export interface SignIntent {
   opportunityId?: string;
   taskId?: string;
   cluster: "mainnet-beta" | "devnet";
-  requiresOperatorTap: true;
-  unattendedForbidden: true;
+  requiresOperatorTap: boolean;
+  unattendedForbidden: boolean;
   signature?: string;
   preparedAt?: string;
   signedAt?: string;
@@ -311,7 +311,24 @@ export type EventName =
   | "sign.rejected"
   | "social.follow_accepted"
   | "social.bio_updated"
-  | "social.fundraiser_drafted";
+  | "social.fundraiser_drafted"
+  | "wallet.benchmark_loss"
+  | "wallet.benchmark_profit"
+  | "wallet.autonomous_signed";
+
+export interface BenchmarkState {
+  baselineUsd: number;
+  lastReportedLossPct: number;
+  lastReportedProfitPct: number;
+  history: {
+    ts: string;
+    type: "loss_warning" | "profit_harvest";
+    percentage: number;
+    equityUsd: number;
+    deltaUsd: number;
+    message: string;
+  }[];
+}
 
 export interface KpiDaily {
   date: string;
@@ -410,6 +427,7 @@ export interface WorldState {
   notifications: NotificationRecord[];
   killSwitch: KillSwitchState;
   ipVault: IpVault;
+  benchmarkState?: BenchmarkState;
   cycleId: string;
   updatedAt: string;
 }
