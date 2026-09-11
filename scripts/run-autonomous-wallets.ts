@@ -20,6 +20,7 @@ export async function runAutonomousWallets(options?: {
   console.log("• Xaman XRPL:        rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4");
   console.log("• Floor Protection:  $500.00 Minimum Wallet Equity");
   console.log("• Reserve Floor:     12.00 XRP Protocol Reserve Limit");
+  console.log("• Xaman Objective:   50+ New XRP / week (Key Target via Magnetic DEX & AMM Yield)");
   console.log("• Benchmarks:        Multiples of 12.5% (Warnings: -12.5%, -25%, -37.5%, -50%...)");
   console.log("                     (Profits Harvested: +12.5%, +25%, +37.5%, +50%...)");
   console.log("===============================================================\n");

@@ -28,4 +28,9 @@
    - **XRP/MAG & XRP/SIGMA Liquidity Monitoring**: Track low-liquidity spikes to set profitable limit sell orders on remaining tokens.
    - **XRPL AMM Yield Pools (XLS-30d)**: Non-directional passive LP fee collection.
    - **Micro Profit Sweeps**: When trades yield net gains, sweep profit into core treasury or hold in spot XRP.
+4. **Weekly Accumulation Objective (50+ New XRP)**:
+   - **Target**: **+50.00 new XRP per week** as a key operational objective.
+   - **Strategy**: Capitalize on Magnetic DEX liquidity spikes, micro-arbitrage on trustlines (SIGMA/MAG), and compound non-directional LP fee yields.
+   - **Protection**: Strictly enforce the 12.00 XRP reserve limit so principal and trustlines remain secure.
+   - **Authority**: Griffty formulates decisions independently, staging actions for operator final authority.
 

@@ -310,9 +310,10 @@ export async function runAutonomousWalletCycle(
     const totalXrp = 16.835;
     const spendableXrp = Math.max(0, totalXrp - reserveLimitXrp);
 
+    const targetWeeklyXrp = world.policy.xamanWeeklyObjectiveXrp ?? 50;
     if (spendableXrp > 0) {
       xamanExecuted = true;
-      xamanAction = `Magnetic DEX Liquidity & AMM Scan active (Spendable: ${spendableXrp.toFixed(3)} XRP, Reserve: ${reserveLimitXrp.toFixed(2)} XRP)`;
+      xamanAction = `Magnetic DEX Liquidity & AMM Scan active (Objective: +${targetWeeklyXrp} new XRP/wk | Spendable: ${spendableXrp.toFixed(3)} XRP | Reserve Floor: ${reserveLimitXrp.toFixed(2)} XRP)`;
     }
   }
 

@@ -31,6 +31,7 @@ export interface StandingOrders {
   watchOnly?: boolean;
   xamanWalletXrpl?: string;
   xamanReserveFloorXrp?: number;
+  xamanWeeklyObjectiveXrp?: number;
   xamanWatchOnly?: boolean;
   allowXamanWalletAutonomy?: boolean;
   phantomAutonomousTrading: boolean;
@@ -69,6 +70,7 @@ export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   watchOnly: false,
   xamanWalletXrpl: "rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4",
   xamanReserveFloorXrp: 12,
+  xamanWeeklyObjectiveXrp: 50,
   xamanWatchOnly: false,
   allowXamanWalletAutonomy: true,
   phantomAutonomousTrading: true,
