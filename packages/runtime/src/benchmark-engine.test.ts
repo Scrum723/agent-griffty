@@ -6,14 +6,45 @@ import {
 } from "./benchmark-engine.js";
 
 describe("benchmark-engine & autonomous wallet runner", () => {
-  it("auto-signs pending Phantom intents without requiring operator approval", async () => {
+  it("makes independent decisions and stages intents awaiting final authority when operatorFinalAuthority is true", async () => {
     const world = emptyWorld();
     world.policy.walletFloorUsd = 500;
     world.policy.allowAgentWalletAutonomy = true;
-    world.policy.phantomAutonomousTrading = true;
+    world.policy.operatorFinalAuthority = true;
     world.signIntents = [
       {
         id: "sign_intent_1",
+        kind: "memo_ack",
+        status: "pending",
+        walletRole: "session",
+        walletId: "wal_session",
+        title: "DEX Swap SOL/USDC",
+        summary: "Autonomous trade decision",
+        cluster: "mainnet-beta",
+        requiresOperatorTap: true,
+        unattendedForbidden: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+
+    const result = await runAutonomousWalletCycle(world, { currentEquityOverride: 600 });
+
+    expect(result.status).toBe("success");
+    expect(result.executedIntents[0].status).toBe("prepared_awaiting_operator_authority");
+    expect(world.signIntents[0].status).toBe("prepared");
+    expect(world.signIntents[0].requiresOperatorTap).toBe(true);
+  });
+
+  it("auto-signs pending Phantom intents when operatorFinalAuthority is explicitly disabled", async () => {
+    const world = emptyWorld();
+    world.policy.walletFloorUsd = 500;
+    world.policy.allowAgentWalletAutonomy = true;
+    world.policy.operatorFinalAuthority = false;
+    world.policy.phantomAutonomousTrading = true;
+    world.signIntents = [
+      {
+        id: "sign_intent_2",
         kind: "memo_ack",
         status: "pending",
         walletRole: "session",
@@ -28,11 +59,10 @@ describe("benchmark-engine & autonomous wallet runner", () => {
       },
     ];
 
-    // Current equity is $600 (above $500 floor)
     const result = await runAutonomousWalletCycle(world, { currentEquityOverride: 600 });
 
     expect(result.status).toBe("success");
-    expect(result.executedIntents.length).toBe(1);
+    expect(result.executedIntents[0].status).toBe("signed");
     expect(result.executedIntents[0].signature).toMatch(/^AUTONOMOUS_SOL_/);
     expect(world.signIntents[0].status).toBe("signed");
     expect(world.events.some((e) => e.name === "wallet.autonomous_signed")).toBe(true);

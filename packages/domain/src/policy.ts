@@ -36,6 +36,8 @@ export interface StandingOrders {
   phantomAutonomousTrading: boolean;
   xamanAutonomousTrading: boolean;
   autonomousExecution: boolean;
+  autonomousDecisionMaking: boolean;
+  operatorFinalAuthority: boolean;
   benchmarkStepPct: number;
   notifyOnlyOnBenchmarks: boolean;
 }
@@ -50,7 +52,7 @@ export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   allowAirdropAutoClaim: false,
   allowVerifiedAirdrops: true,
   allowWalletConnectSign: true,
-  allowUnattendedSign: true,
+  allowUnattendedSign: false,
   allowAgentWalletAutonomy: true,
   agentWalletSolana: "2f2RxyqM4YZHRChncDHxkWvSetZMx4CxYB9rW9BAsZuV",
   pauseProspectingOnFloorWatch: true,
@@ -72,6 +74,8 @@ export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   phantomAutonomousTrading: true,
   xamanAutonomousTrading: true,
   autonomousExecution: true,
+  autonomousDecisionMaking: true,
+  operatorFinalAuthority: true,
   benchmarkStepPct: 12.5,
   notifyOnlyOnBenchmarks: true,
 }) as StandingOrders;

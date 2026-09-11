@@ -18,7 +18,7 @@ export interface BenchmarkEvaluation {
 
 export interface AutonomousRunResult {
   status: "success" | "floor_halt" | "idle";
-  executedIntents: { id: string; title: string; signature: string }[];
+  executedIntents: { id: string; title: string; signature?: string; status: string }[];
   xamanExecuted: boolean;
   xamanAction?: string;
   benchmarks: BenchmarkEvaluation;
@@ -87,6 +87,8 @@ export async function evaluateBenchmarks(
     warningDispatched: false,
   };
 
+  const requiresAuthority = world.policy.operatorFinalAuthority !== false;
+
   // 1. Loss Benchmark Evaluation (e.g. -12.5%, -25.0%, -37.5%, -50.0%...)
   if (deltaPct <= -stepSize) {
     const lossTier = Math.floor(Math.abs(deltaPct) / stepSize) * stepSize;
@@ -95,7 +97,9 @@ export async function evaluateBenchmarks(
       evalResult.lossTierTriggered = lossTier;
       evalResult.warningDispatched = true;
 
-      const warningMsg = `⚠️ [GRIFFTY BENCHMARK LOSS WARNING] Wallet drawdown reached -${lossTier.toFixed(1)}% (Current: $${currentEquity.toFixed(2)}, Basis: $${baseline.toFixed(2)}). Floor protection active at $${floorUsd.toFixed(2)}. Autonomous trading continuing.`;
+      const warningMsg = requiresAuthority
+        ? `⚠️ [GRIFFTY BENCHMARK LOSS WARNING] Wallet drawdown reached -${lossTier.toFixed(1)}% (Current: $${currentEquity.toFixed(2)}, Basis: $${baseline.toFixed(2)}). Floor protection active at $${floorUsd.toFixed(2)}. Independent decision: holding positions; awaiting your final authority for adjustments.`
+        : `⚠️ [GRIFFTY BENCHMARK LOSS WARNING] Wallet drawdown reached -${lossTier.toFixed(1)}% (Current: $${currentEquity.toFixed(2)}, Basis: $${baseline.toFixed(2)}). Floor protection active at $${floorUsd.toFixed(2)}. Autonomous trading continuing.`;
       evalResult.message = warningMsg;
 
       // Add to world notifications
@@ -161,13 +165,17 @@ export async function evaluateBenchmarks(
       evalResult.sweptUsd = sweptUsd;
       const dest = world.policy.dailyProfitSweepTo || "FigKNbrXoMmnonsrBfPgHCS8FKGPMZ7X5zXMY1dCCG2Z";
 
-      const profitMsg = `🚀 [GRIFFTY PROFIT HARVEST] +${profitTier.toFixed(1)}% profit benchmark reached! Pulling $${sweptUsd.toFixed(2)} profit to cold storage (${dest.slice(0, 6)}...${dest.slice(-4)}). Current Equity: $${currentEquity.toFixed(2)}.`;
+      const profitMsg = requiresAuthority
+        ? `🚀 [GRIFFTY PROFIT HARVEST PROPOSAL] +${profitTier.toFixed(1)}% profit benchmark reached! Independent decision: sweep $${sweptUsd.toFixed(2)} to cold storage (${dest.slice(0, 6)}...${dest.slice(-4)}). Awaiting your final authority in dashboard.`
+        : `🚀 [GRIFFTY PROFIT HARVEST] +${profitTier.toFixed(1)}% profit benchmark reached! Pulling $${sweptUsd.toFixed(2)} profit to cold storage (${dest.slice(0, 6)}...${dest.slice(-4)}). Current Equity: $${currentEquity.toFixed(2)}.`;
       evalResult.message = profitMsg;
 
       world.notifications.push({
         id: newId("notif"),
         type: "wallet_benchmark_profit_harvest",
-        title: `Profit Benchmark Harvest: +${profitTier.toFixed(1)}%`,
+        title: requiresAuthority
+          ? `Profit Benchmark Harvest Proposal: +${profitTier.toFixed(1)}%`
+          : `Profit Benchmark Harvest: +${profitTier.toFixed(1)}%`,
         body: profitMsg,
         read: false,
         createdAt: iso,
@@ -239,39 +247,57 @@ export async function runAutonomousWalletCycle(
     };
   }
 
-  const executedIntents: { id: string; title: string; signature: string }[] = [];
+  const executedIntents: { id: string; title: string; signature?: string; status: string }[] = [];
 
-  // 1. Process Phantom Solana Intents Autonomously
+  // 1. Process Phantom Solana Intents
   if (world.policy.phantomAutonomousTrading !== false && world.policy.allowAgentWalletAutonomy !== false) {
     const pending = (world.signIntents ?? []).filter(
       (i) => i.status === "pending" || i.status === "prepared",
     );
 
+    const requiresAuthority = world.policy.operatorFinalAuthority !== false;
+
     for (const intent of pending) {
-      const sig = `AUTONOMOUS_SOL_${Date.now()}_${intent.id.slice(-6)}`;
-      intent.status = "signed";
-      intent.signature = sig;
-      intent.signedAt = iso;
-      intent.updatedAt = iso;
+      if (requiresAuthority) {
+        // Independent decision: Griffty prepares and stages decision, requiring operator final authority
+        intent.status = "prepared";
+        intent.requiresOperatorTap = true;
+        intent.unattendedForbidden = true;
+        intent.preparedAt = iso;
+        intent.updatedAt = iso;
 
-      executedIntents.push({
-        id: intent.id,
-        title: intent.title,
-        signature: sig,
-      });
+        executedIntents.push({
+          id: intent.id,
+          title: intent.title,
+          status: "prepared_awaiting_operator_authority",
+        });
+      } else {
+        const sig = `AUTONOMOUS_SOL_${Date.now()}_${intent.id.slice(-6)}`;
+        intent.status = "signed";
+        intent.signature = sig;
+        intent.signedAt = iso;
+        intent.updatedAt = iso;
 
-      world.events.push({
-        id: newId("evt"),
-        name: "wallet.autonomous_signed",
-        ts: iso,
-        uid: world.operator.uid,
-        cycleId: world.cycleId,
-        props: {
-          intentId: intent.id,
-          walletRole: intent.walletRole,
+        executedIntents.push({
+          id: intent.id,
+          title: intent.title,
           signature: sig,
-        },
-      });
+          status: "signed",
+        });
+
+        world.events.push({
+          id: newId("evt"),
+          name: "wallet.autonomous_signed",
+          ts: iso,
+          uid: world.operator.uid,
+          cycleId: world.cycleId,
+          props: {
+            intentId: intent.id,
+            walletRole: intent.walletRole,
+            signature: sig,
+          },
+        });
+      }
     }
   }
 

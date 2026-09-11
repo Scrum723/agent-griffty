@@ -15,9 +15,9 @@ export async function runAutonomousWallets(options?: {
   console.log("===============================================================");
   console.log("⚡ Agent Griffty — Autonomous Wallet Runner (Phantom & Xaman) ⚡");
   console.log("===============================================================");
-  console.log("• Approval Mode:     UNATTENDED / AUTONOMOUS (Zero operator clicks required)");
+  console.log("• Mode:              INDEPENDENT DECISIONS (Requires Operator Final Authority to execute)");
   console.log("• Solana Agent:      2f2RxyqM4YZHRChncDHxkWvSetZMx4CxYB9rW9BAsZuV");
-  console.log("• Xaman XRPL:        rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4 (Watch-only)");
+  console.log("• Xaman XRPL:        rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4");
   console.log("• Floor Protection:  $500.00 Minimum Wallet Equity");
   console.log("• Reserve Floor:     12.00 XRP Protocol Reserve Limit");
   console.log("• Benchmarks:        Multiples of 12.5% (Warnings: -12.5%, -25%, -37.5%, -50%...)");
@@ -42,12 +42,16 @@ export async function runAutonomousWallets(options?: {
     console.log(`[${time}] 💰 Total Equity: $${result.totalEquityUsd.toFixed(2)} | Floor: $${result.walletFloorUsd.toFixed(2)} (${result.floorStatus.toUpperCase()})`);
     
     if (result.executedIntents.length > 0) {
-      console.log(`  ✓ Auto-signed ${result.executedIntents.length} Phantom intent(s):`);
+      console.log(`  ✓ Processed ${result.executedIntents.length} decision intent(s):`);
       for (const i of result.executedIntents) {
-        console.log(`    • [${i.id}] ${i.title} → ${i.signature}`);
+        if (i.status === "prepared_awaiting_operator_authority") {
+          console.log(`    • [${i.id}] ${i.title} → Prepared autonomously. Awaiting your final authority in dashboard.`);
+        } else {
+          console.log(`    • [${i.id}] ${i.title} → ${i.signature}`);
+        }
       }
     } else {
-      console.log(`  • Phantom intents queue: 0 pending (autonomous guard active)`);
+      console.log(`  • Phantom intents queue: 0 pending (independent guard active)`);
     }
 
     if (result.xamanExecuted) {
