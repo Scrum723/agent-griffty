@@ -24,5 +24,8 @@
   "monitorLiquidityFor100X": true,
   "monitorSniperFor100X": true,
   "autofillgrants": true,
-  "autofillgrantsWallet": ""
+  "autofillgrantsWallet": "",
+  "xamanWalletXrpl": "rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4",
+  "xamanReserveFloorXrp": 12,
+  "xamanWatchOnly": true
 }
