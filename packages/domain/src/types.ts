@@ -208,7 +208,7 @@ export interface Wallet {
   role: WalletRole;
   address: string;
   chain: string;
-  watchOnly: true;
+  watchOnly: boolean;
   assets: WalletAsset[];
   lastPolledAt: string;
 }

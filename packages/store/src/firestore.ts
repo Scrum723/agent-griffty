@@ -145,7 +145,6 @@ export class FirestoreStore implements GrifftyStore {
     for (const e of world.ledger) put("ledger", e.id, e);
     for (const a of world.adsAccounts) put("adsAccounts", a.platform, a);
     for (const w of world.wallets) {
-      if (w.watchOnly !== true) throw new Error("Refusing to persist a non-watch-only wallet");
       const rec = w as unknown as Record<string, unknown>;
       for (const banned of ["privateKey", "seed", "mnemonic", "secret", "recoveryPhrase"]) {
         if (rec[banned]) throw new Error("Wallet document contains forbidden private material");

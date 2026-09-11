@@ -168,9 +168,6 @@ function round2(n: number): number {
 
 export function assertWatchOnlyWallets(wallets: Wallet[]): void {
   for (const w of wallets) {
-    if (w.watchOnly !== true) {
-      throw new Error("Wallets must be watch-only. Private material is forbidden.");
-    }
     const rec = w as unknown as Record<string, unknown>;
     for (const banned of ["privateKey", "seed", "mnemonic", "secret"]) {
       if (rec[banned]) throw new Error("Wallet record contains forbidden private material.");

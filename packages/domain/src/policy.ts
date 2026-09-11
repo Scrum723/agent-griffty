@@ -28,6 +28,7 @@ export interface StandingOrders {
   decisionQueueMin: number;
   decisionWatchMin: number;
   walletFloorUsd: number;
+  watchOnly?: boolean;
   xamanWalletXrpl?: string;
   xamanReserveFloorXrp?: number;
   xamanWatchOnly?: boolean;
@@ -63,6 +64,7 @@ export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   decisionQueueMin: 55,
   decisionWatchMin: 35,
   walletFloorUsd: 500,
+  watchOnly: false,
   xamanWalletXrpl: "rPjrQxdzgw1GoZ6zvzErxBykRVb7VbRaw4",
   xamanReserveFloorXrp: 12,
   xamanWatchOnly: false,
