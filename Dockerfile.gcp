@@ -1,3 +1,4 @@
+# Local/GCP image. Railway uses Railpack (see nixpacks.toml).
 # syntax=docker/dockerfile:1
 # ---- Stage 1: Builder ----
 FROM node:20-slim AS builder
