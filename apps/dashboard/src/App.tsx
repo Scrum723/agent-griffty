@@ -44,11 +44,20 @@ const MAIN_TABS: { id: MainTab; label: string }[] = [
   { id: "growth", label: "Growth" },
 ];
 
+function isIosSafari(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua);
+  const standalone = (window.navigator as { standalone?: boolean }).standalone === true;
+  return ios && !standalone;
+}
+
 export function App() {
   const [world, setWorld] = useState<WorldState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<MainTab>("queue");
+  const [showIos, setShowIos] = useState(isIosSafari);
   const [queueTab, setQueueTab] = useState<"queue" | "rejected" | "events">("queue");
   const [queueFilter, setQueueFilter] = useState("All");
 
@@ -143,6 +152,14 @@ export function App() {
           <div className="banner warn">
             Stretch KPI variance {money(variance)} (harvest {money(harvest)} vs {money(stretch)}).
             Logged as variance — not an incident.
+          </div>
+        )}
+        {showIos && (
+          <div className="banner warn">
+            iPhone: tap Share → Add to Home Screen. Griffty opens like an app (no Safari chrome).
+            <button className="ghost" type="button" onClick={() => setShowIos(false)} style={{ marginLeft: 8 }}>
+              Dismiss
+            </button>
           </div>
         )}
       </div>

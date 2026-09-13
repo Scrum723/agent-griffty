@@ -11,9 +11,14 @@ export interface SignIntent {
 }
 
 const TOKEN = "dev-operator-token";
+const API_BASE =
+  (import.meta as { env?: { VITE_API_BASE?: string } }).env?.VITE_API_BASE ||
+  (typeof window !== "undefined" && window.location.protocol === "file:"
+    ? "http://127.0.0.1:8787"
+    : "");
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers: {
       authorization: `Bearer ${TOKEN}`,
