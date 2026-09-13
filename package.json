@@ -27,6 +27,7 @@
     "griffty": "tsx bin/griffty.ts",
     "electron:dev": "./scripts/start-desktop.sh",
     "electron:dist": "npm run build && npm run dist --workspace=@griffty/electron",
+    "start:web": "tsx apps/server/src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bin": {

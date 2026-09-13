@@ -1,0 +1,12 @@
+# Railway uses the root Dockerfile by default. This file is a Nixpacks fallback.
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build --workspace=@griffty/dashboard"]
+
+[start]
+cmd = "npm run start:web"

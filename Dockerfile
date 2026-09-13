@@ -41,7 +41,7 @@ COPY --from=builder /app/apps/dashboard ./apps/dashboard
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/tsconfig.json ./
-COPY --from=builder /app/.griffty ./.griffty
+RUN mkdir -p /data/.griffty /app/.griffty
 
 # Persistent state volume
 VOLUME ["/data"]

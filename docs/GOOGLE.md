@@ -37,6 +37,20 @@ Flag `CONNECTOR_ADS_GOOGLE=true` plus:
 
 `GET /api/google/status` probes the official Ads API. It does **not** raise budgets.
 
+## CLI restore (after accidental GCP console clicks)
+
+Default project drifted to `dj-botbody` (DJ Data Cloud). Restore:
+
+```bash
+gcloud config set project griffty
+gcloud config set billing/quota_project griffty
+gcloud auth application-default set-quota-project griffty
+```
+
+Do **not** enable every API on every project. Griffty needs Firestore + Secret Manager + (optional) Cloud Run. DJ Botbody is a **separate** GCP project for Halo / Data Cloud.
+
+Antigravity `google.cloud.project` may stay `dj-botbody` while you work in the DJ folder.
+
 ## Scheduler
 
 15-minute cycles belong on **GCP Cloud Scheduler / Cloud Functions**, not Grok Build.
