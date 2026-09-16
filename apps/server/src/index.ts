@@ -16,15 +16,7 @@ const TOKEN = process.env.OPERATOR_TOKEN ?? "dev-operator-token";
 const app = new Hono();
 app.use("*", cors());
 
-app.use("/api/*", async (c, next) => {
-  const header = c.req.header("authorization") ?? "";
-  const query = c.req.query("token");
-  if (header !== `Bearer ${TOKEN}` && query !== TOKEN) {
-    return c.json({ error: "unauthorized" }, 401);
-  }
-  await next();
-});
-
+app.get("/healthz", (c) => c.json({ ok: true, service: "agent-griffty" }));
 app.get("/api/health", (c) =>
   c.json({
     ok: true,
@@ -33,6 +25,16 @@ app.get("/api/health", (c) =>
     google: googleStatus(store.kind),
   }),
 );
+
+app.use("/api/*", async (c, next) => {
+  if (c.req.path === "/api/health") return next();
+  const header = c.req.header("authorization") ?? "";
+  const query = c.req.query("token");
+  if (header !== `Bearer ${TOKEN}` && query !== TOKEN) {
+    return c.json({ error: "unauthorized" }, 401);
+  }
+  await next();
+});
 
 app.get("/api/google/status", async (c) => {
   const ads = await pollGoogleAds();
