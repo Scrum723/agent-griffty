@@ -2,6 +2,7 @@ import { Buffer } from "buffer";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { ProfileGate } from "./ProfileGate";
 import { WalletRoot } from "./WalletRoot";
 import "./styles.css";
 
@@ -16,7 +17,9 @@ if ("serviceWorker" in navigator) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <WalletRoot>
-      <App />
+      <ProfileGate>
+        <App />
+      </ProfileGate>
     </WalletRoot>
   </StrictMode>,
 );

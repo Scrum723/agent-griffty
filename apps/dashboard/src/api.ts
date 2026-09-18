@@ -10,7 +10,14 @@ export interface SignIntent {
   cluster: string;
 }
 
-const TOKEN = "dev-operator-token";
+export interface UserProfile {
+  id: string;
+  name: string;
+  avatar: string;
+  bio: string;
+  notifications: { notifyEmail: boolean; notifyPush: boolean; notifySms: boolean };
+}
+
 const API_BASE =
   (import.meta as { env?: { VITE_API_BASE?: string } }).env?.VITE_API_BASE ||
   (typeof window !== "undefined" && window.location.protocol === "file:"
@@ -19,9 +26,9 @@ const API_BASE =
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
+    credentials: "include",
     ...init,
     headers: {
-      authorization: `Bearer ${TOKEN}`,
       "content-type": "application/json",
       ...(init?.headers ?? {}),
     },
@@ -57,4 +64,18 @@ export const api = {
   approveSocialPost: (id: string) => req(`/api/social/posts/${id}/approve`, { method: "POST" }),
   rejectSocialPost: (id: string) => req(`/api/social/posts/${id}/reject`, { method: "POST" }),
   auditIpVault: () => req(`/api/ip-vault/audit`, { method: "POST" }),
+  me: () => req<{ profile: UserProfile | null }>("/api/me"),
+  startSession: (body: { name: string; avatar?: string; bio?: string }) =>
+    req<{ profile: UserProfile }>("/api/session", { method: "POST", body: JSON.stringify(body) }),
+  saveProfile: (body: Partial<UserProfile>) => req<{ profile: UserProfile }>("/api/me", { method: "PUT", body: JSON.stringify(body) }),
+  pauseCampaign: (id: string) => req(`/api/campaigns/${id}/pause`, { method: "POST" }),
+  resumeCampaign: (id: string) => req(`/api/campaigns/${id}/resume`, { method: "POST" }),
+  setBudget: (id: string, dailyBudgetUsd: number) =>
+    req(`/api/campaigns/${id}/budget`, { method: "POST", body: JSON.stringify({ dailyBudgetUsd }) }),
+  pushNotify: (title: string, body: string) =>
+    req(`/api/notify`, { method: "POST", body: JSON.stringify({ title, body }) }),
+  analytics: (days = 7) =>
+    req<{ harvestUsd: number; series: { date: string; harvestUsd: number }[]; campaigns: WorldState["campaigns"] }>(
+      `/api/analytics?days=${days}`,
+    ),
 };

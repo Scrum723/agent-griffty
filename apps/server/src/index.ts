@@ -3,37 +3,75 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { newId } from "@griffty/domain";
 import { form1099Ready, phantomBrowseLink, runCycle, taxLotExport } from "@griffty/runtime";
-import { googleStatus, loadDotEnv, openStore, upsertWatchWallet } from "@griffty/store";
+import {
+  createProfile,
+  googleStatus,
+  loadDotEnv,
+  openStore,
+  profileFromToken,
+  updateProfile,
+  upsertWatchWallet,
+} from "@griffty/store";
 import { pollGoogleAds } from "@griffty/connectors";
 import type { WalletRole } from "@griffty/domain";
 import { prepareMemoTransaction } from "./phantom.js";
+import { handleMcpRequest } from "./mcp.js";
+import { getCookie, setCookie } from "hono/cookie";
 
 loadDotEnv();
 const store = openStore();
 console.log(`Agent Griffty store: ${store.kind}`);
 const TOKEN = process.env.OPERATOR_TOKEN ?? "dev-operator-token";
+const MCP_TOKEN = process.env.MCP_AUTH_TOKEN ?? "";
+const SESSION_COOKIE = "griffty_sid";
 
 const app = new Hono();
-app.use("*", cors());
+app.use("*", cors({ origin: (o) => o || "*", credentials: true }));
 
+const healthBody = () => ({
+  ok: true as const,
+  service: "agent-griffty",
+  grokBuildLoops: false,
+  google: googleStatus(store.kind),
+});
+
+app.get("/health", (c) => c.json(healthBody()));
 app.get("/healthz", (c) => c.json({ ok: true, service: "agent-griffty" }));
-app.get("/api/health", (c) =>
-  c.json({
-    ok: true,
-    service: "agent-griffty",
-    grokBuildLoops: false,
-    google: googleStatus(store.kind),
-  }),
-);
+app.get("/api/health", (c) => c.json(healthBody()));
+
+app.all("/mcp", async (c) => {
+  if (!MCP_TOKEN) return c.json({ error: "MCP_AUTH_TOKEN is not configured" }, 503);
+  const header = c.req.header("authorization") ?? "";
+  if (header !== `Bearer ${MCP_TOKEN}`) return c.json({ error: "unauthorized" }, 401);
+  return handleMcpRequest(store, c.req.raw);
+});
+
+app.post("/api/session", async (c) => {
+  const body = await c.req.json<{ name?: string; avatar?: string; bio?: string }>().catch(() => ({}));
+  const { profile, token } = await createProfile({
+    name: body.name || "Operator",
+    avatar: body.avatar,
+    bio: body.bio,
+  });
+  setCookie(c, SESSION_COOKIE, token, { httpOnly: true, sameSite: "Lax", path: "/", maxAge: 60 * 60 * 24 * 30 });
+  return c.json({ profile });
+});
 
 app.use("/api/*", async (c, next) => {
-  if (c.req.path === "/api/health") return next();
+  if (c.req.path === "/api/health" || c.req.path === "/api/session" || c.req.path === "/api/me") return next();
   const header = c.req.header("authorization") ?? "";
   const query = c.req.query("token");
-  if (header !== `Bearer ${TOKEN}` && query !== TOKEN) {
-    return c.json({ error: "unauthorized" }, 401);
+  const sid = getCookie(c, SESSION_COOKIE);
+  const profile = await profileFromToken(sid);
+  if (profile) {
+    await next();
+    return;
   }
-  await next();
+  if (header === `Bearer ${TOKEN}` || query === TOKEN) {
+    await next();
+    return;
+  }
+  return c.json({ error: "unauthorized" }, 401);
 });
 
 app.get("/api/google/status", async (c) => {
@@ -261,6 +299,94 @@ app.post("/api/social/posts/:id/reject", async (c) => {
   return c.json({ ok: true, post });
 });
 
+app.get("/api/me", async (c) => {
+  const sid = getCookie(c, SESSION_COOKIE);
+  const profile = await profileFromToken(sid);
+  return c.json({ profile });
+});
+
+app.put("/api/me", async (c) => {
+  const sid = getCookie(c, SESSION_COOKIE);
+  const current = await profileFromToken(sid);
+  if (!current) return c.json({ error: "sign in first" }, 401);
+  const body = await c.req.json<{
+    name?: string;
+    avatar?: string;
+    bio?: string;
+    notifications?: { notifyEmail: boolean; notifyPush: boolean; notifySms: boolean };
+  }>();
+  const profile = await updateProfile(current.id, body);
+  return c.json({ profile });
+});
+
+app.post("/api/campaigns/:id/pause", async (c) => {
+  const world = await store.load();
+  const camp = world.campaigns.find((x) => x.id === c.req.param("id"));
+  if (!camp) return c.json({ error: "campaign not found" }, 404);
+  camp.status = "paused";
+  world.updatedAt = new Date().toISOString();
+  await store.save(world);
+  return c.json({ campaign: camp });
+});
+
+app.post("/api/campaigns/:id/resume", async (c) => {
+  const world = await store.load();
+  const camp = world.campaigns.find((x) => x.id === c.req.param("id"));
+  if (!camp) return c.json({ error: "campaign not found" }, 404);
+  camp.status = "active";
+  world.updatedAt = new Date().toISOString();
+  await store.save(world);
+  return c.json({ campaign: camp });
+});
+
+app.post("/api/campaigns/:id/budget", async (c) => {
+  const body = await c.req.json<{ dailyBudgetUsd?: number }>();
+  const world = await store.load();
+  const camp = world.campaigns.find((x) => x.id === c.req.param("id"));
+  if (!camp) return c.json({ error: "campaign not found" }, 404);
+  if (typeof body.dailyBudgetUsd !== "number" || body.dailyBudgetUsd < 0) {
+    return c.json({ error: "dailyBudgetUsd must be a number" }, 400);
+  }
+  camp.dailyBudgetUsd = body.dailyBudgetUsd;
+  world.updatedAt = new Date().toISOString();
+  await store.save(world);
+  return c.json({ campaign: camp });
+});
+
+app.post("/api/notify", async (c) => {
+  const body = await c.req.json<{ title?: string; body?: string }>();
+  const world = await store.load();
+  const note = {
+    id: newId("ntf"),
+    type: "push",
+    title: body.title || "Griffty",
+    body: body.body || "",
+    read: false,
+    createdAt: new Date().toISOString(),
+  };
+  world.notifications.unshift(note);
+  world.notifications = world.notifications.slice(0, 100);
+  await store.save(world);
+  return c.json({ notification: note });
+});
+
+app.get("/api/analytics", async (c) => {
+  const days = Number(c.req.query("days") || 7);
+  const world = await store.load();
+  const n = Number.isFinite(days) && days > 0 ? days : 7;
+  const cut = Date.now() - n * 86400000;
+  const series = world.kpiDaily.filter((k) => new Date(k.date).getTime() >= cut);
+  const harvest = series.reduce((s, k) => s + k.harvestUsd, 0);
+  return c.json({
+    days: n,
+    harvestUsd: harvest,
+    stretchTargetUsd: world.policy.stretchTargetUsd,
+    adsFloorUsd: world.policy.adsFloorUsd,
+    series,
+    campaigns: world.campaigns,
+  });
+});
+
 app.post("/api/ip-vault/audit", async (c) => {
   const world = await store.load();
   if (!world.ipVault) {
@@ -280,6 +406,6 @@ if (existsSync("./apps/dashboard/dist")) {
 }
 
 const port = Number(process.env.PORT ?? 8787);
-console.log(`Agent Griffty API on http://127.0.0.1:${port}`);
+console.log(`Agent Griffty API on http://0.0.0.0:${port}`);
 
-serve({ fetch: app.fetch, port });
+serve({ fetch: app.fetch, port, hostname: "0.0.0.0" });

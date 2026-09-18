@@ -82,7 +82,22 @@ footer { margin-top: 18px; display: flex; gap: 18px; color: var(--muted); font-s
   .kpis { grid-template-columns: 1fr 1fr; }
   .grid { grid-template-columns: 1fr; }
   .top { flex-direction: column; align-items: flex-start; }
+  .tabs { overflow-x: auto; }
+  .camp-row { flex-direction: column; align-items: flex-start; }
 }
+
+.welcome { max-width: 520px; }
+.welcome-card { display: flex; flex-direction: column; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 18px; }
+.welcome-card input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.field { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.field input, .field textarea { padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; }
+.bars { display: flex; align-items: flex-end; gap: 6px; min-height: 110px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar { width: 100%; max-width: 28px; background: var(--accent); border-radius: 4px 4px 0 0; }
+.bar-col span { font-size: 10px; color: var(--muted); }
+.camp-row { align-items: center; }
+.camp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* User custom paragraph styling */
 p.p1 { margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px 'Helvetica Neue'; }

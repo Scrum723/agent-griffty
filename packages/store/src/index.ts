@@ -5,4 +5,5 @@ export * from "./google.js";
 export * from "./memory.js";
 export * from "./open.js";
 export * from "./paths.js";
+export * from "./profiles.js";
 export * from "./wallets.js";

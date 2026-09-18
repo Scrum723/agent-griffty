@@ -30,9 +30,11 @@ function Kpi(props: { label: string; value: string; hint: string; tone?: "ok" | 
   );
 }
 
-type MainTab = "queue" | "pnl" | "ads" | "wallets" | "alerts" | "social" | "platforms" | "music" | "growth";
+type MainTab = "home" | "profile" | "queue" | "pnl" | "ads" | "wallets" | "alerts" | "social" | "platforms" | "music" | "growth";
 
 const MAIN_TABS: { id: MainTab; label: string }[] = [
+  { id: "home", label: "Home" },
+  { id: "profile", label: "My profile" },
   { id: "queue", label: "Queue" },
   { id: "pnl", label: "P&L" },
   { id: "ads", label: "Ads" },
@@ -56,7 +58,7 @@ export function App() {
   const [world, setWorld] = useState<WorldState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState<MainTab>("queue");
+  const [tab, setTab] = useState<MainTab>("home");
   const [showIos, setShowIos] = useState(isIosSafari);
   const [queueTab, setQueueTab] = useState<"queue" | "rejected" | "events">("queue");
   const [queueFilter, setQueueFilter] = useState("All");
@@ -132,9 +134,9 @@ export function App() {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="top">
         <div>
-          <p className="eyebrow">Doc Weather · closed-loop growth</p>
-          <h1>Agent Griffty</h1>
-          <p className="sub">Scout · Qualifier · Risk · Executor · Treasury · Ads Ops</p>
+          <p className="eyebrow">Doc Weather · your growth desk</p>
+          <h1>Griffty</h1>
+          <p className="sub">See how campaigns and money are doing. Tap a button to act — we’ll ask you to confirm first.</p>
         </div>
         <div className="actions">
           <button disabled={busy} onClick={() => void run("cycle")} aria-label="Run cycle">Run cycle</button>
@@ -179,6 +181,11 @@ export function App() {
           </button>
         ))}
       </div>
+
+      {tab === "home" && world && (
+        <HomeDesk world={world} refresh={refresh} busy={busy} setBusy={setBusy} setError={setError} />
+      )}
+      {tab === "profile" && <ProfilePage setError={setError} />}
 
       <div id="main-content" role="tabpanel" aria-labelledby={`tab-${tab}`}>
         <div className="grid">
@@ -497,6 +504,162 @@ export function App() {
         <span>dark web disabled · seed phrases never stored</span>
       </footer>
     </div>
+  );
+}
+
+function HomeDesk(props: {
+  world: WorldState;
+  refresh: () => Promise<void>;
+  busy: boolean;
+  setBusy: (v: boolean) => void;
+  setError: (v: string | null) => void;
+}) {
+  const { world, refresh, busy, setBusy, setError } = props;
+  const ads = adsTotal(world);
+  const harvest = world.kpiDaily.at(-1)?.harvestUsd ?? 0;
+  const maxH = Math.max(1, ...world.kpiDaily.map((k) => k.harvestUsd));
+
+  async function act(label: string, fn: () => Promise<unknown>) {
+    if (!window.confirm(`${label}? This changes live Griffty data.`)) return;
+    setBusy(true);
+    try {
+      await fn();
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="span-2">
+      <section className="kpis">
+        <Kpi label="Today’s harvest" value={money(harvest)} hint="money Griffty booked today" />
+        <Kpi label="Treasury cash" value={money(world.cashUsd)} hint="operating cash on hand" />
+        <Kpi
+          label="Ads prepaid"
+          value={money(ads)}
+          hint={`floor ${money(world.policy.adsFloorUsd)}`}
+          tone={world.adsAccounts[0]?.status === "ok" ? "ok" : "warn"}
+        />
+        <Kpi label="Live campaigns" value={String(world.campaigns.filter((c) => c.status === "active").length)} hint={`${world.campaigns.length} total`} />
+      </section>
+      <section className="panel mt">
+        <h2>Last 14 days</h2>
+        <div className="bars" aria-hidden="true">
+          {world.kpiDaily.slice(-14).map((k) => (
+            <div key={k.date} className="bar-col">
+              <div className="bar" style={{ height: `${Math.max(8, (k.harvestUsd / maxH) * 90)}px` }} />
+              <span>{k.date.slice(5)}</span>
+            </div>
+          ))}
+          {world.kpiDaily.length === 0 && <p className="dim">No harvest yet. Run a cycle to fill this chart.</p>}
+        </div>
+      </section>
+      <section className="panel mt">
+        <h2>Campaigns — tap to pause, resume, or change daily budget</h2>
+        <ul className="rows">
+          {world.campaigns.map((c) => (
+            <li key={c.id} className="camp-row">
+              <div>
+                <strong>{c.name}</strong>
+                <div className="dim">
+                  {c.platform} · ${c.dailyBudgetUsd}/day · {c.status}
+                </div>
+              </div>
+              <div className="camp-actions">
+                {c.status === "active" ? (
+                  <button disabled={busy} className="ghost" onClick={() => void act(`Pause ${c.name}`, () => api.pauseCampaign(c.id))}>
+                    Pause
+                  </button>
+                ) : (
+                  <button disabled={busy} onClick={() => void act(`Resume ${c.name}`, () => api.resumeCampaign(c.id))}>
+                    Resume
+                  </button>
+                )}
+                <button
+                  disabled={busy}
+                  className="ghost"
+                  onClick={() => {
+                    const raw = window.prompt(`New daily budget for ${c.name} (USD)`, String(c.dailyBudgetUsd));
+                    if (raw == null) return;
+                    const n = Number(raw);
+                    if (!Number.isFinite(n) || n < 0) return;
+                    void act(`Set ${c.name} budget to $${n}`, () => api.setBudget(c.id, n));
+                  }}
+                >
+                  Budget
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="camp-actions mt">
+          <button disabled={busy} onClick={() => void act("Send a test push notification", () => api.pushNotify("Griffty", "Test ping from your dashboard"))}>
+            Send test notification
+          </button>
+          <button disabled={busy} className="ghost" onClick={() => void act("Refresh analytics", () => api.analytics(7).then(() => undefined))}>
+            Refresh analytics
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ProfilePage(props: { setError: (v: string | null) => void }) {
+  const [profile, setProfile] = useState<{ name: string; avatar: string; bio: string; notifications: { notifyEmail: boolean; notifyPush: boolean; notifySms: boolean } } | null>(null);
+  const [saved, setSaved] = useState("");
+  useEffect(() => {
+    void api.me().then((r) => r.profile && setProfile(r.profile));
+  }, []);
+  if (!profile) return <p className="dim">Loading your profile…</p>;
+  return (
+    <section className="panel span-2">
+      <h2>My profile</h2>
+      <p className="dim">This is only yours. Other people on this device get their own desk after they enter a name.</p>
+      <label className="field">
+        Name
+        <input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
+      </label>
+      <label className="field">
+        Avatar URL (optional)
+        <input value={profile.avatar} onChange={(e) => setProfile({ ...profile, avatar: e.target.value })} placeholder="https://…" />
+      </label>
+      {profile.avatar ? <img src={profile.avatar} alt="" className="avatar" /> : null}
+      <label className="field">
+        Bio
+        <textarea value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} rows={3} />
+      </label>
+      <fieldset className="field">
+        <legend>Notifications</legend>
+        <label>
+          <input type="checkbox" checked={profile.notifications.notifyEmail} onChange={(e) => setProfile({ ...profile, notifications: { ...profile.notifications, notifyEmail: e.target.checked } })} /> Email
+        </label>
+        <label>
+          <input type="checkbox" checked={profile.notifications.notifyPush} onChange={(e) => setProfile({ ...profile, notifications: { ...profile.notifications, notifyPush: e.target.checked } })} /> Push
+        </label>
+        <label>
+          <input type="checkbox" checked={profile.notifications.notifySms} onChange={(e) => setProfile({ ...profile, notifications: { ...profile.notifications, notifySms: e.target.checked } })} /> SMS
+        </label>
+      </fieldset>
+      <button
+        type="button"
+        onClick={() => {
+          void api
+            .saveProfile(profile)
+            .then((r) => {
+              setProfile(r.profile);
+              setSaved("Saved.");
+            })
+            .catch((e) => props.setError(e instanceof Error ? e.message : "Save failed"));
+        }}
+      >
+        Save profile
+      </button>
+      {saved && <span className="dim"> {saved}</span>}
+    </section>
   );
 }
 
