@@ -38,14 +38,13 @@ Use the browser desk. Grok is disconnected.
 | `MCP_AUTH_TOKEN` | **Railway Variables** (service `agent-griffty`) | Bearer for `/mcp` only. Never in the browser. |
 | `CONNECTOR_ADS_GOOGLE` | optional | Google Ads probe |
 
-## Grok is disconnected (operator order 2026-09-18)
+## Grok liaison (per question only)
 
 Griffty **does not run on Grok Build**. `grokBuildLoops` is frozen false. No scheduled Grok tasks.
 
-The Grok TUI MCP connector to `https://griffty.net/mcp` was **removed**. Grok cannot call Griffty tools, so Griffty work does not spend Grok tokens.
+Grok TUI MCP is **on** as a liaison: `https://griffty.net/mcp`. Grok only calls it when you ask in chat. No ask → no Grok tokens for Griffty.
 
-Griffty itself runs on **Railway** (your project, your domain). Dashboard: https://griffty.net  
-Do **not** add it back under grok.com/connectors unless you explicitly want Grok to drive it.
+The website still runs on Railway: https://griffty.net
 
 1. **Railway plugin** — already listed in Grok plugins. Complete OAuth at the Railway plugin if it still says unauthorized: Grok plugins → Railway → Connect.
 2. **Griffty MCP** — https://grok.com/connectors → Custom connector → URL `https://griffty.net/mcp` → Auth: Bearer token from Railway variable `MCP_AUTH_TOKEN`.
