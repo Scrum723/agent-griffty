@@ -74,6 +74,32 @@ export const api = {
     req(`/api/campaigns/${id}/budget`, { method: "POST", body: JSON.stringify({ dailyBudgetUsd }) }),
   pushNotify: (title: string, body: string) =>
     req(`/api/notify`, { method: "POST", body: JSON.stringify({ title, body }) }),
+  investments: () =>
+    req<{
+      dailyTargetUsd: number;
+      harvestTodayUsd: number;
+      gapUsd: number;
+      defaultStopPct: number;
+      defaultTakePct: number;
+      investments: Array<{
+        id: string;
+        name: string;
+        kind: string;
+        healthScore: number;
+        eligible: boolean;
+        proposedUsd: number;
+        stopLossPct: number;
+        takeProfitPct: number;
+        stopNote: string;
+        takeNote: string;
+        status: string;
+        reasons: string[];
+      }>;
+    }>("/api/investments"),
+  setInvestmentStops: (id: string, stopLossPct: number, takeProfitPct: number) =>
+    req(`/api/investments/${id}/stops`, { method: "POST", body: JSON.stringify({ stopLossPct, takeProfitPct }) }),
+  acceptInvestment: (id: string) => req(`/api/investments/${id}/accept`, { method: "POST" }),
+  rejectInvestment: (id: string) => req(`/api/investments/${id}/reject`, { method: "POST" }),
   analytics: (days = 7) =>
     req<{ harvestUsd: number; series: { date: string; harvestUsd: number }[]; campaigns: WorldState["campaigns"] }>(
       `/api/analytics?days=${days}`,

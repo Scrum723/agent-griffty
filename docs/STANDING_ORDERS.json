@@ -1,7 +1,7 @@
 {
   "adsFloorUsd": 1000,
   "adsBufferUsd": 250,
-  "stretchTargetUsd": 500,
+  "stretchTargetUsd": 115,
   "humanGateUsd": 750,
   "zeroCapital": true,
   "completeallprioritized": true,

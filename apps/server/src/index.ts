@@ -6,9 +6,13 @@ import { form1099Ready, phantomBrowseLink, runCycle, taxLotExport } from "@griff
 import {
   createProfile,
   googleStatus,
+  listInvestments,
   loadDotEnv,
   openStore,
   profileFromToken,
+  proposeInvestment,
+  setInvestmentStatus,
+  setInvestmentStops,
   updateProfile,
   upsertWatchWallet,
 } from "@griffty/store";
@@ -368,6 +372,84 @@ app.post("/api/notify", async (c) => {
   world.notifications = world.notifications.slice(0, 100);
   await store.save(world);
   return c.json({ notification: note });
+});
+
+app.get("/api/investments", async (c) => {
+  const world = await store.load();
+  if (world.policy.stretchTargetUsd !== 115) {
+    world.policy.stretchTargetUsd = 115;
+    await store.save(world);
+  }
+  const today = world.kpiDaily.at(-1)?.harvestUsd ?? 0;
+  return c.json({
+    dailyTargetUsd: world.policy.stretchTargetUsd,
+    harvestTodayUsd: today,
+    gapUsd: Math.max(0, world.policy.stretchTargetUsd - today),
+    defaultStopPct: 10,
+    defaultTakePct: 25,
+    investments: await listInvestments(),
+  });
+});
+
+app.post("/api/investments", async (c) => {
+  const body = await c.req.json<{
+    name: string;
+    kind?: "startup" | "protocol" | "token";
+    url?: string;
+    liquidityUsd?: number;
+    volume7dUsd?: number;
+    volume30dUsd?: number;
+    holderOrUserGrowthPct?: number;
+    publicDocs?: boolean;
+    teamIdentifiable?: boolean;
+    githubOrProductAlive?: boolean;
+    claimsGuaranteedReturn?: boolean;
+    anonymousMintOrStealthLaunch?: boolean;
+    proposedUsd?: number;
+    tractionNote?: string;
+  }>();
+  if (!body.name) return c.json({ error: "name required" }, 400);
+  const row = await proposeInvestment(
+    {
+      name: body.name,
+      kind: body.kind ?? "startup",
+      url: body.url,
+      liquidityUsd: body.liquidityUsd ?? 0,
+      volume7dUsd: body.volume7dUsd ?? 0,
+      volume30dUsd: body.volume30dUsd ?? 0,
+      holderOrUserGrowthPct: body.holderOrUserGrowthPct ?? 0,
+      publicDocs: Boolean(body.publicDocs),
+      teamIdentifiable: Boolean(body.teamIdentifiable),
+      githubOrProductAlive: Boolean(body.githubOrProductAlive),
+      claimsGuaranteedReturn: Boolean(body.claimsGuaranteedReturn),
+      anonymousMintOrStealthLaunch: Boolean(body.anonymousMintOrStealthLaunch),
+      tractionNote: body.tractionNote,
+    },
+    typeof body.proposedUsd === "number" ? body.proposedUsd : 25,
+  );
+  return c.json({ investment: row });
+});
+
+app.post("/api/investments/:id/stops", async (c) => {
+  const body = await c.req.json<{ stopLossPct?: number; takeProfitPct?: number }>();
+  const row = await setInvestmentStops(c.req.param("id"), Number(body.stopLossPct), Number(body.takeProfitPct));
+  if (!row) return c.json({ error: "not found" }, 404);
+  return c.json({ investment: row });
+});
+
+app.post("/api/investments/:id/accept", async (c) => {
+  const row = await setInvestmentStatus(c.req.param("id"), "accepted");
+  if (!row) return c.json({ error: "not found" }, 404);
+  return c.json({
+    investment: row,
+    note: "Accepted thesis. On-chain fill still needs your wallet Approve — Griffty does not sign.",
+  });
+});
+
+app.post("/api/investments/:id/reject", async (c) => {
+  const row = await setInvestmentStatus(c.req.param("id"), "rejected");
+  if (!row) return c.json({ error: "not found" }, 404);
+  return c.json({ investment: row });
 });
 
 app.get("/api/analytics", async (c) => {

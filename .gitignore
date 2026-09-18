@@ -9,6 +9,7 @@ dist
 apps/dashboard/dist
 functions/lib
 coverage
+.griffty/investments.json
 secrets/
 *.pem
 *.p12

@@ -30,10 +30,11 @@ function Kpi(props: { label: string; value: string; hint: string; tone?: "ok" | 
   );
 }
 
-type MainTab = "home" | "profile" | "queue" | "pnl" | "ads" | "wallets" | "alerts" | "social" | "platforms" | "music" | "growth";
+type MainTab = "home" | "invest" | "profile" | "queue" | "pnl" | "ads" | "wallets" | "alerts" | "social" | "platforms" | "music" | "growth";
 
 const MAIN_TABS: { id: MainTab; label: string }[] = [
   { id: "home", label: "Home" },
+  { id: "invest", label: "Invest" },
   { id: "profile", label: "My profile" },
   { id: "queue", label: "Queue" },
   { id: "pnl", label: "P&L" },
@@ -185,6 +186,7 @@ export function App() {
       {tab === "home" && world && (
         <HomeDesk world={world} refresh={refresh} busy={busy} setBusy={setBusy} setError={setError} />
       )}
+      {tab === "invest" && <InvestDesk setError={setError} />}
       {tab === "profile" && <ProfilePage setError={setError} />}
 
       <div id="main-content" role="tabpanel" aria-labelledby={`tab-${tab}`}>
@@ -508,6 +510,78 @@ export function App() {
   );
 }
 
+function InvestDesk(props: { setError: (v: string | null) => void }) {
+  const [data, setData] = useState<Awaited<ReturnType<typeof api.investments>> | null>(null);
+  const load = () => {
+    void api
+      .investments()
+      .then(setData)
+      .catch((e) => props.setError(e instanceof Error ? e.message : "investments failed"));
+  };
+  useEffect(() => {
+    load();
+  }, []);
+  if (!data) return <p className="dim">Loading investment desk…</p>;
+  return (
+    <section className="panel span-2">
+      <h2>Invest — $115 / day objective</h2>
+      <p className="dim">
+        Griffty scores projects on docs, identifiable team, liquidity, volume trend, and user/holder growth.
+        Guaranteed-return pitches are rejected. Default stops: −{data.defaultStopPct}% / +{data.defaultTakePct}%. You can change them before any capital is used. On-chain still needs your wallet Approve.
+      </p>
+      <div className="kpis">
+        <Kpi label="Today" value={money(data.harvestTodayUsd)} hint={`target ${money(data.dailyTargetUsd)}`} tone={data.harvestTodayUsd >= data.dailyTargetUsd ? "ok" : "warn"} />
+        <Kpi label="Gap" value={money(data.gapUsd)} hint="still to go today" />
+      </div>
+      <ul className="rows">
+        {data.investments.map((inv) => (
+          <li key={inv.id} className="camp-row">
+            <div>
+              <strong>{inv.name}</strong> <span className={`pill ${inv.eligible ? "ok" : "watch"}`}>{inv.healthScore}/100</span>
+              <div className="dim">
+                {inv.kind} · ${inv.proposedUsd} · {inv.status}
+                <br />
+                {inv.stopNote} {inv.takeNote}
+              </div>
+            </div>
+            <div className="camp-actions">
+              <button
+                className="ghost"
+                onClick={() => {
+                  const sl = Number(window.prompt("Stop loss %", String(inv.stopLossPct)));
+                  const tp = Number(window.prompt("Take profit %", String(inv.takeProfitPct)));
+                  if (!Number.isFinite(sl) || !Number.isFinite(tp)) return;
+                  void api.setInvestmentStops(inv.id, sl, tp).then(load);
+                }}
+              >
+                Adjust stops
+              </button>
+              {inv.eligible && inv.status === "proposed" && (
+                <button
+                  onClick={() => {
+                    if (!window.confirm(`Accept ${inv.name} at −${inv.stopLossPct}% / +${inv.takeProfitPct}%? Wallet sign is still yours.`)) return;
+                    void api.acceptInvestment(inv.id).then(load);
+                  }}
+                >
+                  I like these
+                </button>
+              )}
+              {inv.status === "proposed" && (
+                <button className="ghost" onClick={() => void api.rejectInvestment(inv.id).then(load)}>
+                  Pass
+                </button>
+              )}
+            </div>
+          </li>
+        ))}
+        {data.investments.length === 0 && (
+          <li className="dim">No theses yet. Ask Grok in chat to score a project, or wait for Griffty to propose one that clears the health screen.</li>
+        )}
+      </ul>
+    </section>
+  );
+}
+
 function HomeDesk(props: {
   world: WorldState;
   refresh: () => Promise<void>;
@@ -536,7 +610,12 @@ function HomeDesk(props: {
   return (
     <div className="span-2">
       <section className="kpis">
-        <Kpi label="Today’s harvest" value={money(harvest)} hint="money Griffty booked today" />
+        <Kpi
+          label="Today vs $115"
+          value={money(harvest)}
+          hint={`objective ${money(world.policy.stretchTargetUsd)} (target, not a promise)`}
+          tone={harvest >= (world.policy.stretchTargetUsd || 115) ? "ok" : "warn"}
+        />
         <Kpi label="Treasury cash" value={money(world.cashUsd)} hint="operating cash on hand" />
         <Kpi
           label="Ads prepaid"

@@ -46,7 +46,7 @@ export interface StandingOrders {
 export const DEFAULT_STANDING_ORDERS: StandingOrders = Object.freeze({
   adsFloorUsd: 100,
   adsBufferUsd: 25,
-  stretchTargetUsd: 50,
+  stretchTargetUsd: 115,
   humanGateUsd: 75,
   zeroCapital: true,
   allowGasOnKnownChains: true,

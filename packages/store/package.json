@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@griffty/domain": "*",
+    "@griffty/scoring": "*",
     "firebase-admin": "^13.5.0",
     "google-auth-library": "^10.6.1"
   }
