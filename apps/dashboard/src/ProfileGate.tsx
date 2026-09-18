@@ -24,9 +24,11 @@ export function ProfileGate({ children }: { children: React.ReactNode }) {
   if (!profile) {
     return (
       <div className="shell welcome">
-        <p className="eyebrow">Doc Weather</p>
-        <h1>Welcome to Griffty</h1>
-        <p className="sub">Your own desk for campaigns, treasury, and alerts. Nothing technical required.</p>
+        <p className="eyebrow">Doc Weather · standalone app</p>
+        <h1>Griffty</h1>
+        <p className="sub">
+          This is Griffty’s own interface — campaigns, treasury, and alerts. It is <strong>not Grok</strong> and does not use Grok tokens or Grok Build.
+        </p>
         <form
           className="welcome-card"
           onSubmit={(e) => {

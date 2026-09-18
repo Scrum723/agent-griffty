@@ -1,5 +1,14 @@
 # Griffty production — 2026-09-16
 
+## Custom interface (not Grok)
+
+Use the browser desk. Grok is disconnected.
+
+- **Cloud:** https://griffty.net (enter your name → Home)
+- **Mac/local:** `npm run start:web` then http://127.0.0.1:8787
+- Pause/resume ads, budgets, treasury, notifications, profile — all in the UI
+- iPhone: Safari → Add to Home Screen
+
 ## Live
 
 | | |

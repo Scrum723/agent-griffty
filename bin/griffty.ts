@@ -70,8 +70,14 @@ Environment:
   GRIFFTY_STORE          file (default) | firestore
   GRIFFTY_STATE_DIR      path to state dir (default: .griffty)
   OPERATOR_TOKEN         API bearer token (default: dev-operator-token)
-  XAI_API_KEY            xAI Grok API key (optional, uses deterministic rubric without it)
+  GRIFFTY_URL            dashboard API (default http://127.0.0.1:8787)
 
-Docs: https://github.com/charlesclottin/agent-griffty
+Griffty is a standalone app (Railway / local). It does not run on Grok Build
+and does not spend Grok tokens. Open the desk in a browser:
+
+  https://griffty.net
+  or: npm run start:web   → http://127.0.0.1:8787
+
+Docs: https://github.com/Scrum723/agent-griffty
     `);
 }

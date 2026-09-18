@@ -502,6 +502,7 @@ export function App() {
         <span>cycle {world?.cycleId ?? "—"}</span>
         <span>updated {world?.updatedAt ?? "—"}</span>
         <span>dark web disabled · seed phrases never stored</span>
+        <span>standalone app · not Grok · not Grok Build</span>
       </footer>
     </div>
   );
