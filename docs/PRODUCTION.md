@@ -29,7 +29,15 @@
 | `MCP_AUTH_TOKEN` | **Railway Variables** (service `agent-griffty`) | Bearer for `/mcp` only. Never in the browser. |
 | `CONNECTOR_ADS_GOOGLE` | optional | Google Ads probe |
 
-## Grok connections (you click OAuth)
+## Grok connections
+
+**This Grok TUI session:** `grok mcp doctor griffty` — healthy, handshake OK, 6 tools. Config: `~/.grok/config.toml` `[mcp_servers.griffty]` → `https://griffty.net/mcp` with `Authorization` header from Railway `MCP_AUTH_TOKEN`.
+
+Railway plugin is enabled (`plugins.enabled` includes `railway`). `railway setup agent -y` reported MCP already configured and logged in.
+
+**grok.com (browser):** if you use the website instead of this TUI, still add a custom connector at https://grok.com/connectors with URL `https://griffty.net/mcp` and Bearer from Railway → agent-griffty → `MCP_AUTH_TOKEN`.
+
+Start a **new Grok chat** in this TUI so the Griffty tools load (this session started before the connector was added).
 
 1. **Railway plugin** — already listed in Grok plugins. Complete OAuth at the Railway plugin if it still says unauthorized: Grok plugins → Railway → Connect.
 2. **Griffty MCP** — https://grok.com/connectors → Custom connector → URL `https://griffty.net/mcp` → Auth: Bearer token from Railway variable `MCP_AUTH_TOKEN`.
