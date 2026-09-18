@@ -21,7 +21,7 @@
     "dev": "npm run dev:server & npm run dev:dashboard",
     "dev:server": "GRIFFTY_STATE_DIR=.griffty npm run dev --workspace=@griffty/server",
     "dev:dashboard": "npm run dev --workspace=@griffty/dashboard",
-    "build": "npm run build --workspace=@griffty/dashboard",
+    "build": "npm run build --workspace=@griffty/server && npm run build --workspace=@griffty/dashboard",
     "docker:build": "docker build -t griffty .",
     "docker:up": "docker compose up",
     "griffty": "tsx bin/griffty.ts",
